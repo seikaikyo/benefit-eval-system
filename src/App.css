@@ -1,0 +1,350 @@
+body {
+  font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f8f9fa;
+  line-height: 1.6;
+}
+
+.App {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Header styles */
+.header {
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.header p {
+  margin: 10px 0 0 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* Config Panel styles */
+.config-panel {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+.config-panel h2 {
+  margin: 0 0 20px 0;
+  color: #495057;
+  font-size: 20px;
+}
+
+.config-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.config-section:last-child {
+  border-bottom: none;
+}
+
+.config-section h3 {
+  margin: 0 0 15px 0;
+  color: #1976d2;
+  font-size: 16px;
+}
+
+.config-row {
+  margin-bottom: 15px;
+}
+
+.config-row label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #495057;
+}
+
+.config-row input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.service-category {
+  margin-bottom: 20px;
+}
+
+.service-category h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.service-config {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.service-config h5 {
+  margin: 0 0 10px 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.config-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.config-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #495057;
+}
+
+.checkbox-label {
+  font-weight: bold !important;
+}
+
+.config-controls input[type="number"] {
+  width: 80px;
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 3px;
+}
+
+.info-box {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 13px;
+  color: #1976d2;
+}
+
+.info-box p {
+  margin: 5px 0;
+}
+
+/* Comparison Table styles */
+.comparison-container {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.comparison-table th {
+  background: #f8f9fa;
+  padding: 15px 12px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #dee2e6;
+  color: #495057;
+}
+
+.comparison-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.category-header {
+  background: #e3f2fd;
+  font-weight: bold;
+  color: #1976d2;
+  text-align: center;
+  padding: 15px;
+}
+
+.platform-col {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+}
+
+.hardware-col {
+  background: #f3e5f5;
+  border-left: 4px solid #9c27b0;
+}
+
+.feature-item {
+  margin-bottom: 8px;
+  padding-left: 15px;
+  position: relative;
+  font-size: 12px;
+}
+
+.feature-item:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #666;
+  font-weight: bold;
+}
+
+.price-highlight {
+  font-size: 16px;
+  font-weight: bold;
+  color: #d32f2f;
+  text-align: center;
+}
+
+/* Summary Box styles */
+.summary-box {
+  background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.summary-box h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+}
+
+.summary-item {
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.summary-item h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.summary-item p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Export Buttons styles */
+.export-buttons {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.export-buttons h3 {
+  margin: 0 0 20px 0;
+  color: #495057;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.export-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.pdf-btn {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+}
+
+.pdf-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+.excel-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: white;
+}
+
+.excel-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.export-info {
+  font-size: 13px;
+  color: #6c757d;
+  margin-top: 15px;
+}
+
+.export-info p {
+  margin: 5px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    margin: 10px;
+    padding: 10px;
+  }
+  
+  .comparison-table {
+    font-size: 11px;
+  }
+  
+  .comparison-table th,
+  .comparison-table td {
+    padding: 6px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+  }
+  
+  .header p {
+    font-size: 12px;
+  }
+  
+  .config-panel {
+    padding: 15px;
+  }
+}
