@@ -129,27 +129,46 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       }
       
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5, // 適度提高解析度但不過高避免記憶體問題
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: 794,
-        height: element.scrollHeight
+        height: element.scrollHeight,
+        logging: false, // 關閉日誌避免控制台雜訊
+        removeContainer: true, // 清理容器
+        imageTimeout: 15000, // 增加圖像超時時間
+        onclone: function(clonedDoc) {
+          // 確保克隆文件的樣式正確應用
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = `
+            * { 
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+            .page-break { 
+              page-break-before: always !important; 
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+        }
       })
 
-      const imgData = canvas.toDataURL('image/png')
+      const imgData = canvas.toDataURL('image/png', 0.95) // 輕微壓縮減少檔案大小
       const pdf = new jsPDF('p', 'mm', 'a4')
       
-      const imgWidth = 210 // A4寬度
-      const pageHeight = 297 // A4高度
+      const imgWidth = 210 // A4寬度(mm)
+      const pageHeight = 297 // A4高度(mm) 
       const imgHeight = (canvas.height * imgWidth) / canvas.width
       let heightLeft = imgHeight
       let position = 0
 
+      // 添加第一頁
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
       heightLeft -= pageHeight
 
-      while (heightLeft >= 0) {
+      // 如果內容超過一頁，添加後續頁面
+      while (heightLeft > 0) {
         position = heightLeft - imgHeight
         pdf.addPage()
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)

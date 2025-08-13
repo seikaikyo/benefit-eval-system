@@ -80,7 +80,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   return (
     <div id="pdf-quote-container" style={{
       width: '794px', // A4寬度(210mm * 3.78)
-      minHeight: '1123px', // A4高度(297mm * 3.78)
+      minHeight: 'auto', // 自動高度，避免內容被截斷
       margin: '0 auto',
       padding: '40px',
       background: 'white',
@@ -88,7 +88,12 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       fontSize: '12px',
       lineHeight: '1.4',
       color: '#333',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      pageBreakInside: 'avoid', // 避免在元素內部分頁
+      '@media print': {
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }
     }}>
       {/* 報價書頭部 */}
       <div style={{
@@ -151,7 +156,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       </div>
 
       {/* 服務功能對照表 */}
-      <div style={{ marginBottom: '25px' }}>
+      <div style={{ 
+        marginBottom: '25px',
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}>
         <h3 style={{
           fontSize: '16px',
           color: '#1976d2',
@@ -301,7 +310,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       </div>
 
       {/* 班別風險分析 */}
-      <div style={{ marginBottom: '25px' }}>
+      <div style={{ 
+        marginBottom: '25px',
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}>
         <h3 style={{
           fontSize: '16px',
           color: '#1976d2',
@@ -411,7 +424,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       </div>
 
       {/* 成本效益分析 */}
-      <div style={{ marginBottom: '25px' }}>
+      <div style={{ 
+        marginBottom: '25px',
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}>
         <h3 style={{
           fontSize: '16px',
           color: '#1976d2',
