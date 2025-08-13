@@ -264,6 +264,56 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       const suitabilityWS = XLSX.utils.aoa_to_sheet(suitabilityData)
       XLSX.utils.book_append_sheet(workbook, suitabilityWS, '智能適用性分析')
 
+      // 綜合建議工作表
+      const recommendationData = [
+        ['建議類型', '內容'],
+        ['', ''],
+        ['基於您的營運模式分析', ''],
+        ['公司名稱', companyInfo.companyName],
+        ['年營業額', `${(companyInfo.annualRevenue / 10000).toFixed(1)}億台幣`],
+        ['生產模式', shiftPatterns[companyInfo.shiftPattern].name],
+        ['特殊需求', companyInfo.specialRequirements],
+        ['', ''],
+        ['成本效益計算', ''],
+        ['每小時營業額', `${hourlyRevenue.toLocaleString()}元`],
+        ['服務投資回報時間', ''],
+      ]
+
+      // 為每個組合計算回報時間
+      const combinations = [
+        { name: 'Basic組合', platform: 'basic', hardware: 'basic' },
+        { name: 'Advanced組合', platform: 'advanced', hardware: 'advanced' },
+        { name: 'Premium組合', platform: 'premium', hardware: 'premium' }
+      ]
+
+      combinations.forEach(combo => {
+        const totalCost = (serviceDetails.platform[combo.platform].enabled ? serviceDetails.platform[combo.platform].price : 0) + 
+                         (serviceDetails.hardware[combo.hardware].enabled ? serviceDetails.hardware[combo.hardware].price : 0)
+        const breakEvenHours = totalCost / hourlyRevenue
+        recommendationData.push([
+          combo.name,
+          `避免${breakEvenHours.toFixed(1)}小時停機即可回本 (年成本${totalCost.toLocaleString()}元)`
+        ])
+      })
+
+      recommendationData.push(['', ''])
+      recommendationData.push(['最終建議', ''])
+      
+      // 根據班別給出具體建議
+      if (shiftPatterns[companyInfo.shiftPattern].workingHours >= 24) {
+        recommendationData.push(['建議方案', 'Premium組合 - 24小時生產環境的最佳選擇'])
+        recommendationData.push(['理由', '7*24技術支援+預防性維護，確保連續生產不中斷'])
+      } else if (shiftPatterns[companyInfo.shiftPattern].workingHours >= 12) {
+        recommendationData.push(['建議方案', 'Advanced組合 - 兩班制生產的平衡選擇'])
+        recommendationData.push(['理由', '充足技術支援+預防性維護，成本效益佳'])
+      } else {
+        recommendationData.push(['建議方案', 'Advanced組合 - 標準班制的推薦選擇'])
+        recommendationData.push(['理由', '服務等級匹配，預防性維護降低風險'])
+      }
+
+      const recommendationWS = XLSX.utils.aoa_to_sheet(recommendationData)
+      XLSX.utils.book_append_sheet(workbook, recommendationWS, '綜合建議')
+
       const fileName = `${companyInfo.companyName}_效益評估數據_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
       XLSX.writeFile(workbook, fileName)
     } catch (error) {
