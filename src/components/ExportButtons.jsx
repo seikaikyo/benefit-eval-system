@@ -153,9 +153,11 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     try {
       const workbook = XLSX.utils.book_new()
       
-      // 公司資訊工作表
+      // 第一個工作表：公司資訊
       const companyData = [
-        ['項目', '內容'],
+        ['研華 WISE-IoT SRP 維運服務報價書'],
+        [''],
+        ['客戶資訊', ''],
         ['公司名稱', companyInfo.companyName],
         ['聯絡地址', companyInfo.address],
         ['聯絡人', companyInfo.contact],
@@ -164,157 +166,118 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['傳真', companyInfo.fax],
         ['報價日期', companyInfo.quoteDate],
         ['有效期限', companyInfo.validDate],
-        ['年營業額 (萬元)', companyInfo.annualRevenue],
-        ['年營業額 (新台幣)', `NT$ ${(companyInfo.annualRevenue * 10000).toLocaleString()}`],
+        [''],
+        ['營運資訊', ''],
+        ['年營業額', `${(companyInfo.annualRevenue / 10000).toFixed(1)}億台幣`],
+        ['生產模式', shiftPatterns[companyInfo.shiftPattern].name],
         ['特殊需求', companyInfo.specialRequirements],
-        ['生產班別', shiftPatterns[companyInfo.shiftPattern].name],
         ['班別描述', shiftPatterns[companyInfo.shiftPattern].description]
       ]
       const companyWS = XLSX.utils.aoa_to_sheet(companyData)
-      XLSX.utils.book_append_sheet(workbook, companyWS, '公司資訊')
+      XLSX.utils.book_append_sheet(workbook, companyWS, '客戶資訊')
 
-      // 服務詳細工作表
-      const servicesData = [
-        ['服務類型', '方案', '產品編號', '服務標題', '價格', '啟用狀態', '服務項目']
+      // 第二個工作表：標準服務功能對照表 (與系統預覽完全一致)
+      const serviceComparisonData = [
+        ['維運功能項目', 'Basic', 'Advanced', 'Premium'],
+        [''],
+        ['平台與應用層', '', '', ''],
+        ['遠端異常排除 (登入/存取/UI/負載)', '✓', '✓', '✓'],
+        ['軟體功能維持與錯誤修正', '✓', '✓', '✓'],
+        ['協助平台應用軟體升級', '✗', '✓(1次)', '✓(1次)'],
+        ['協助網路憑證更新', '✗', '✓(1次)', '✓(1次)'],
+        ['協助執行資料庫備份', '✗', '✓(2次)', '✓(2次)'],
+        ['遠端歲修開關機作業', '✗', '✓(1次)', '✓(1次)'],
+        ['平台健康狀態巡檢', '✗', '✓(4次)', '✓(4次)'],
+        ['重大風險主動通知', '✗', '✓', '✓'],
+        ['平台層線上基本維運培訓', '✗', '4小時', '4小時'],
+        ['應用層線上基本維運培訓', '✗', '8小時', '8小時'],
+        ['原廠專家開發技術諮詢', '✗', '✗', '✓'],
+        [''],
+        ['硬體基礎層', '', '', ''],
+        ['技術支援 (工單/郵件/免付費電話)', '✓', '✓', '✓'],
+        ['專屬Line報修管道', '✗', '✓', '✓'],
+        ['專線電話', '✗', '✗', '✓'],
+        ['軟體、韌體更新服務', '✓', '✓', '✓'],
+        ['硬體層監控軟體與告警配置', '✗', '✓(1次)', '✓(1次)'],
+        ['到場服務（隔日到府維修）', '2次', '2次', '2次'],
+        ['基礎層設備巡檢', '✗', '5*8/2次', '5*8/2次'],
+        ['到場服務時段', '5*8', '5*8', '7*8'],
+        ['全時段技術支援 (7*24)', '✗', '✗', '✓'],
+        ['基礎層線上基本運維培訓', '✗', '2小時', '2小時'],
+        [''],
+        ['年度價格 (新台幣)', '', '', ''],
+        ['平台與應用層', `NT$ ${serviceDetails.platform.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.premium.price.toLocaleString()}`],
+        ['硬體基礎層', `NT$ ${serviceDetails.hardware.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.premium.price.toLocaleString()}`],
+        ['組合總價', `NT$ ${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}`]
       ]
-      
-      Object.entries(serviceDetails.platform).forEach(([type, config]) => {
-        servicesData.push([
-          '平台與應用層',
-          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
-          config.productCode,
-          config.title,
-          config.price,
-          config.enabled ? '是' : '否',
-          config.features.join('; ')
-        ])
-      })
-      
-      Object.entries(serviceDetails.hardware).forEach(([type, config]) => {
-        servicesData.push([
-          '硬體基礎層',
-          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
-          config.productCode,
-          config.title,
-          config.price,
-          config.enabled ? '是' : '否',
-          config.features.join('; ')
-        ])
-      })
-      
-      const servicesWS = XLSX.utils.aoa_to_sheet(servicesData)
-      XLSX.utils.book_append_sheet(workbook, servicesWS, '服務詳細')
+      const serviceComparisonWS = XLSX.utils.aoa_to_sheet(serviceComparisonData)
+      XLSX.utils.book_append_sheet(workbook, serviceComparisonWS, '服務功能對照表')
 
-      // 成本效益分析工作表
+      // 第三個工作表：成本效益分析
       const annualRevenueNT = companyInfo.annualRevenue * 10000
-      const dailyRevenue = Math.floor(annualRevenueNT / 365)
       const hourlyRevenue = Math.floor(annualRevenueNT / 365 / 24)
       
       const costBenefitData = [
-        ['項目', '數值'],
-        ['年營業額 (萬元)', companyInfo.annualRevenue],
-        ['年營業額 (新台幣)', annualRevenueNT],
-        ['日營業額', dailyRevenue],
-        ['時營業額', hourlyRevenue],
-        ['生產班別', shiftPatterns[companyInfo.shiftPattern].name],
-        ['班別描述', shiftPatterns[companyInfo.shiftPattern].description],
-        ['', ''],
-        ['停機時間', '損失金額'],
-        ['2小時', hourlyRevenue * 2],
-        ['4小時', hourlyRevenue * 4],
-        ['8小時', hourlyRevenue * 8],
-        ['', ''],
-        ['方案組合', '年度成本'],
-        ['Basic + Basic', (serviceDetails.platform.basic.enabled ? serviceDetails.platform.basic.price : 0) + (serviceDetails.hardware.basic.enabled ? serviceDetails.hardware.basic.price : 0)],
-        ['Advanced + Advanced', (serviceDetails.platform.advanced.enabled ? serviceDetails.platform.advanced.price : 0) + (serviceDetails.hardware.advanced.enabled ? serviceDetails.hardware.advanced.price : 0)],
-        ['Premium + Premium', (serviceDetails.platform.premium.enabled ? serviceDetails.platform.premium.price : 0) + (serviceDetails.hardware.premium.enabled ? serviceDetails.hardware.premium.price : 0)]
+        ['成本效益分析'],
+        [''],
+        ['營業數據', ''],
+        ['年營業額', `${(companyInfo.annualRevenue / 10000).toFixed(1)}億台幣`],
+        ['日營業額', `${Math.floor(annualRevenueNT / 365).toLocaleString()}元`],
+        ['時營業額', `${hourlyRevenue.toLocaleString()}元`],
+        [''],
+        ['停機風險分析', ''],
+        ['2小時停機損失', `${(hourlyRevenue * 2).toLocaleString()}元`],
+        ['4小時停機損失', `${(hourlyRevenue * 4).toLocaleString()}元`],
+        ['8小時停機損失', `${(hourlyRevenue * 8).toLocaleString()}元`],
+        [''],
+        ['投資回報分析', ''],
+        ['Basic方案年成本', `${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}元`],
+        ['Basic方案回本時間', `${((serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price) / hourlyRevenue).toFixed(1)}小時停機`],
+        [''],
+        ['Advanced方案年成本', `${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}元`],
+        ['Advanced方案回本時間', `${((serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price) / hourlyRevenue).toFixed(1)}小時停機`],
+        [''],
+        ['Premium方案年成本', `${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}元`],
+        ['Premium方案回本時間', `${((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / hourlyRevenue).toFixed(1)}小時停機`],
+        ['Premium成本占營業額比例', `${(((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / annualRevenueNT) * 100).toFixed(3)}%`]
       ]
       const costBenefitWS = XLSX.utils.aoa_to_sheet(costBenefitData)
       XLSX.utils.book_append_sheet(workbook, costBenefitWS, '成本效益分析')
 
-      // 智能適用性分析工作表
-      const suitabilityData = [
-        ['服務類型', '方案', '適用性評級', '推薦狀態', '分析要點']
-      ]
+      // 第四個工作表：適用性建議
+      const currentShift = shiftPatterns[companyInfo.shiftPattern]
+      let recommendedPlan = 'Advanced'
+      let reason = '充足技術支援+預防性維護，成本效益佳'
       
-      // 平台服務分析
-      ['basic', 'advanced', 'premium'].forEach(type => {
-        const analysis = analyzeServiceSuitability('platform', type)
-        suitabilityData.push([
-          '平台與應用層',
-          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
-          analysis.level,
-          analysis.recommendation,
-          analysis.items.join(' | ')
-        ])
-      })
-      
-      // 硬體服務分析
-      ['basic', 'advanced', 'premium'].forEach(type => {
-        const analysis = analyzeServiceSuitability('hardware', type)
-        suitabilityData.push([
-          '硬體基礎層',
-          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
-          analysis.level,
-          analysis.recommendation,
-          analysis.items.join(' | ')
-        ])
-      })
-      
-      const suitabilityWS = XLSX.utils.aoa_to_sheet(suitabilityData)
-      XLSX.utils.book_append_sheet(workbook, suitabilityWS, '智能適用性分析')
-
-      // 綜合建議工作表
-      const recommendationData = [
-        ['建議類型', '內容'],
-        ['', ''],
-        ['基於您的營運模式分析', ''],
-        ['公司名稱', companyInfo.companyName],
-        ['年營業額', `${(companyInfo.annualRevenue / 10000).toFixed(1)}億台幣`],
-        ['生產模式', shiftPatterns[companyInfo.shiftPattern].name],
-        ['特殊需求', companyInfo.specialRequirements],
-        ['', ''],
-        ['成本效益計算', ''],
-        ['每小時營業額', `${hourlyRevenue.toLocaleString()}元`],
-        ['服務投資回報時間', ''],
-      ]
-
-      // 為每個組合計算回報時間
-      const combinations = [
-        { name: 'Basic組合', platform: 'basic', hardware: 'basic' },
-        { name: 'Advanced組合', platform: 'advanced', hardware: 'advanced' },
-        { name: 'Premium組合', platform: 'premium', hardware: 'premium' }
-      ]
-
-      combinations.forEach(combo => {
-        const totalCost = (serviceDetails.platform[combo.platform].enabled ? serviceDetails.platform[combo.platform].price : 0) + 
-                         (serviceDetails.hardware[combo.hardware].enabled ? serviceDetails.hardware[combo.hardware].price : 0)
-        const breakEvenHours = totalCost / hourlyRevenue
-        recommendationData.push([
-          combo.name,
-          `避免${breakEvenHours.toFixed(1)}小時停機即可回本 (年成本${totalCost.toLocaleString()}元)`
-        ])
-      })
-
-      recommendationData.push(['', ''])
-      recommendationData.push(['最終建議', ''])
-      
-      // 根據班別給出具體建議
-      if (shiftPatterns[companyInfo.shiftPattern].workingHours >= 24) {
-        recommendationData.push(['建議方案', 'Premium組合 - 24小時生產環境的最佳選擇'])
-        recommendationData.push(['理由', '7*24技術支援+預防性維護，確保連續生產不中斷'])
-      } else if (shiftPatterns[companyInfo.shiftPattern].workingHours >= 12) {
-        recommendationData.push(['建議方案', 'Advanced組合 - 兩班制生產的平衡選擇'])
-        recommendationData.push(['理由', '充足技術支援+預防性維護，成本效益佳'])
-      } else {
-        recommendationData.push(['建議方案', 'Advanced組合 - 標準班制的推薦選擇'])
-        recommendationData.push(['理由', '服務等級匹配，預防性維護降低風險'])
+      if (currentShift.workingHours >= 24) {
+        recommendedPlan = 'Premium'
+        reason = '7*24技術支援+預防性維護，確保連續生產不中斷'
       }
 
+      const recommendationData = [
+        ['適用性評估與建議'],
+        [''],
+        ['客戶營運狀況', ''],
+        ['生產模式', currentShift.name],
+        ['工作時數', `${currentShift.workingHours}小時`],
+        ['風險係數', currentShift.riskMultiplier],
+        ['特殊需求', companyInfo.specialRequirements],
+        [''],
+        ['方案適用性評估', ''],
+        ['Basic方案', '❌ 高風險 - 僅5*8支援，對24小時生產環境風險過高'],
+        ['Advanced方案', currentShift.workingHours >= 24 ? '⚠️ 中等風險 - 夜班故障風險仍存在' : '✅ 推薦 - 適合一般生產環境'],
+        ['Premium方案', '✅ 最佳選擇 - 7*24支援，最適合關鍵生產環境'],
+        [''],
+        ['最終建議', ''],
+        ['推薦方案', `${recommendedPlan}組合`],
+        ['建議理由', reason],
+        ['投資效益', `避免${((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / hourlyRevenue).toFixed(1)}小時停機即可回本`],
+        ['年度保障價值', `成本僅占營業額${(((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / annualRevenueNT) * 100).toFixed(3)}%，獲得全方位保障`]
+      ]
       const recommendationWS = XLSX.utils.aoa_to_sheet(recommendationData)
-      XLSX.utils.book_append_sheet(workbook, recommendationWS, '綜合建議')
+      XLSX.utils.book_append_sheet(workbook, recommendationWS, '適用性建議')
 
-      const fileName = `${companyInfo.companyName}_智能效益評估數據_V2.0_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
+      const fileName = `${companyInfo.companyName}_維運服務報價書_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
       XLSX.writeFile(workbook, fileName)
     } catch (error) {
       console.error('Excel export failed:', error)
@@ -324,26 +287,20 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
 
   return (
     <div className="export-buttons">
-      <h3>📤 匯出選項</h3>
+      <h3>📤 匯出報價書</h3>
       <div className="button-group">
-        <button 
-          className="export-btn pdf-btn" 
-          onClick={exportToPDF}
-          title="匯出完整比較表為PDF格式"
-        >
-          📄 匯出 PDF
-        </button>
         <button 
           className="export-btn excel-btn" 
           onClick={exportToExcel}
-          title="匯出詳細數據為Excel格式，便於後續編輯"
+          title="匯出標準服務對照表格式的維運服務報價書"
         >
-          📊 匯出 Excel
+          📊 匯出 Excel 報價書
         </button>
       </div>
       <div className="export-info">
-        <p>• PDF格式：適合簡報和客戶展示</p>
-        <p>• Excel格式：便於數據編輯和進一步分析</p>
+        <p>• 包含完整服務功能對照表</p>
+        <p>• 客戶資訊與成本效益分析</p>
+        <p>• Excel格式便於轉換PDF或後續編輯</p>
       </div>
     </div>
   )
