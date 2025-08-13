@@ -448,8 +448,220 @@ body {
   margin: 5px 0;
 }
 
+/* Shift Patterns and Requirements Grid */
+.shift-requirements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.shift-patterns-section h4,
+.requirements-section h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+/* Radio Group Styles */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.radio-label:hover {
+  border-color: #1976d2;
+  background: #f8fcff;
+}
+
+.radio-label input[type="radio"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #1976d2;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.radio-label input[type="radio"]:checked {
+  background: #1976d2;
+}
+
+.radio-label:has(input[type="radio"]:checked) {
+  border-color: #1976d2;
+  background: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+}
+
+.radio-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.radio-content strong {
+  color: #495057;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.radio-description {
+  color: #6c757d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Textarea Styles */
+.requirements-section textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 180px;
+  transition: border-color 0.3s ease;
+}
+
+.requirements-section textarea:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+.requirements-section textarea::placeholder {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* Service Comparison Table Config */
+.service-comparison {
+  margin-top: 15px;
+}
+
+.comparison-table-config {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comparison-table-config thead th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.comparison-table-config tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.comparison-table-config .category-header {
+  background: #f8f9fa;
+  font-weight: bold;
+  color: #495057;
+  text-align: center;
+  border-right: 2px solid #dee2e6;
+}
+
+.comparison-table-config .price-cell {
+  background: #fff3cd;
+  font-weight: bold;
+  color: #856404;
+  text-align: center;
+  font-size: 14px;
+}
+
+.comparison-table-config .total-price-cell {
+  background: #d1ecf1;
+  font-weight: bold;
+  color: #0c5460;
+  text-align: center;
+  font-size: 15px;
+}
+
+.comparison-table-config .features-cell {
+  background: #f8f9fa;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.feature-preview {
+  margin-bottom: 3px;
+  color: #495057;
+}
+
+.feature-more {
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 5px;
+  font-size: 11px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
+  .shift-requirements-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .radio-label {
+    padding: 12px;
+  }
+  
+  .radio-content strong {
+    font-size: 13px;
+  }
+  
+  .radio-description {
+    font-size: 11px;
+  }
+  
+  .requirements-section textarea {
+    min-height: 120px;
+    font-size: 13px;
+  }
+  
+  .comparison-table-config {
+    font-size: 11px;
+  }
+  
+  .comparison-table-config thead th {
+    padding: 8px 5px;
+    font-size: 11px;
+  }
+  
+  .comparison-table-config tbody td {
+    padding: 8px 5px;
+  }
+  
   body {
     margin: 10px;
     padding: 10px;

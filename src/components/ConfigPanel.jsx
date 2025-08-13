@@ -154,31 +154,37 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
             </label>
           </div>
         </div>
-        <div className="config-row">
-          <label>
-            特殊需求:
-            <input 
-              type="text" 
+        <div className="shift-requirements-grid">
+          <div className="shift-patterns-section">
+            <h4>🏭 生產班別模式</h4>
+            <div className="radio-group">
+              {Object.entries(shiftPatterns).map(([key, pattern]) => (
+                <label key={key} className="radio-label">
+                  <input 
+                    type="radio" 
+                    name="shiftPattern"
+                    value={key}
+                    checked={companyInfo.shiftPattern === key}
+                    onChange={(e) => handleCompanyInfoChange('shiftPattern', e.target.value)}
+                  />
+                  <div className="radio-content">
+                    <strong>{pattern.name}</strong>
+                    <span className="radio-description">{pattern.description}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          <div className="requirements-section">
+            <h4>📝 特殊需求</h4>
+            <textarea 
               value={companyInfo.specialRequirements}
               onChange={(e) => handleCompanyInfoChange('specialRequirements', e.target.value)}
+              placeholder="請描述客戶的特殊需求，例如：&#10;• 24小時四班二輪制生產環境&#10;• 系統停機影響重大&#10;• 需要中文介面支援&#10;• 特殊安全要求等..."
+              rows="8"
             />
-          </label>
-        </div>
-        
-        <div className="config-row">
-          <label>
-            生產班別模式:
-            <select 
-              value={companyInfo.shiftPattern}
-              onChange={(e) => handleCompanyInfoChange('shiftPattern', e.target.value)}
-            >
-              {Object.entries(shiftPatterns).map(([key, pattern]) => (
-                <option key={key} value={key}>
-                  {pattern.name} - {pattern.description}
-                </option>
-              ))}
-            </select>
-          </label>
+          </div>
         </div>
       </div>
 
@@ -337,6 +343,96 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="config-section">
+        <h3>📊 服務項目對比表</h3>
+        <div className="service-comparison">
+          <table className="comparison-table-config">
+            <thead>
+              <tr>
+                <th style={{width: '15%'}}>服務類型</th>
+                <th style={{width: '25%'}}>Basic MA</th>
+                <th style={{width: '30%'}}>Advanced MA</th>
+                <th style={{width: '30%'}}>Premium MA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="category-header">平台層價格</td>
+                <td className="price-cell">NT$ {serviceDetails.platform.basic.price.toLocaleString()}</td>
+                <td className="price-cell">NT$ {serviceDetails.platform.advanced.price.toLocaleString()}</td>
+                <td className="price-cell">NT$ {serviceDetails.platform.premium.price.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td className="category-header">平台層項目</td>
+                <td className="features-cell">
+                  {serviceDetails.platform.basic.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.platform.basic.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.platform.basic.features.length} 項</div>
+                  }
+                </td>
+                <td className="features-cell">
+                  {serviceDetails.platform.advanced.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.platform.advanced.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.platform.advanced.features.length} 項</div>
+                  }
+                </td>
+                <td className="features-cell">
+                  {serviceDetails.platform.premium.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.platform.premium.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.platform.premium.features.length} 項</div>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td className="category-header">硬體層價格</td>
+                <td className="price-cell">NT$ {serviceDetails.hardware.basic.price.toLocaleString()}</td>
+                <td className="price-cell">NT$ {serviceDetails.hardware.advanced.price.toLocaleString()}</td>
+                <td className="price-cell">NT$ {serviceDetails.hardware.premium.price.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td className="category-header">硬體層項目</td>
+                <td className="features-cell">
+                  {serviceDetails.hardware.basic.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.hardware.basic.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.hardware.basic.features.length} 項</div>
+                  }
+                </td>
+                <td className="features-cell">
+                  {serviceDetails.hardware.advanced.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.hardware.advanced.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.hardware.advanced.features.length} 項</div>
+                  }
+                </td>
+                <td className="features-cell">
+                  {serviceDetails.hardware.premium.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="feature-preview">• {feature}</div>
+                  ))}
+                  {serviceDetails.hardware.premium.features.length > 3 && 
+                    <div className="feature-more">...等 {serviceDetails.hardware.premium.features.length} 項</div>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td className="category-header">組合總價</td>
+                <td className="total-price-cell">NT$ {(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}</td>
+                <td className="total-price-cell">NT$ {(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}</td>
+                <td className="total-price-cell">NT$ {(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
