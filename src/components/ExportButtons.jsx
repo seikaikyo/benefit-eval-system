@@ -4,6 +4,112 @@ import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
+  // 智能分析服務適用性 (從 ComparisonTable 複製過來)
+  const analyzeServiceSuitability = (category, type) => {
+    const service = serviceDetails[category][type]
+    if (!service.enabled) return { level: 'disabled', recommendation: '未啟用', color: '#9e9e9e', items: ['此方案未啟用'] }
+    
+    const features = service.features.join(' ').toLowerCase()
+    const currentShift = shiftPatterns[companyInfo.shiftPattern]
+    const annualRevenueNT = companyInfo.annualRevenue * 10000
+    const servicePrice = service.price
+    
+    // 分析關鍵字
+    const has24x7 = features.includes('7*24') || features.includes('24小時') || features.includes('全時段')
+    const has5x8 = features.includes('5*8') || features.includes('工作時間')
+    const hasInspection = features.includes('巡檢') || features.includes('定期') || features.includes('檢查')
+    const hasOnSite = features.includes('到場') || features.includes('現場') || features.includes('維修')
+    
+    // 計算停機損失 vs 服務成本比
+    const hourlyRevenue = annualRevenueNT / 365 / 24
+    const breakEvenHours = servicePrice / hourlyRevenue
+    
+    // 根據班別和服務特性評估
+    let level, recommendation, color, items = []
+    
+    if (currentShift.workingHours >= 24) {
+      if (has24x7 && hasOnSite && hasInspection) {
+        level = 'excellent'
+        recommendation = '✅ 強烈推薦'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '🔧 全時段技術支援，最適合連續生產',
+          '🚀 到場服務與預防性維護並重',
+          '⚡ 風險最小化，生產連續性最大化'
+        ]
+      } else if (has5x8 && hasInspection) {
+        level = 'conditional'
+        recommendation = '⚠️ 有條件適用'
+        color = '#f57c00'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 夜班時段仍有風險，需內部支援',
+          '🔍 有預防性維護，可降低故障機率',
+          '👥 建議：配備夜班技術人員'
+        ]
+      } else {
+        level = 'risky'
+        recommendation = '❌ 不建議'
+        color = '#d32f2f'
+        items = [
+          `💰 風險：單次 ${breakEvenHours.toFixed(1)} 小時停機損失就超過節省成本`,
+          '🚨 24小時生產但缺乏夜間支援',
+          '⚠️ 無預防性維護，故障風險高',
+          '💡 建議：升級到更高級別方案'
+        ]
+      }
+    } else if (currentShift.workingHours >= 12) {
+      if (has24x7 || (has5x8 && hasInspection)) {
+        level = 'excellent'
+        recommendation = '✅ 推薦'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⚖️ 服務等級與生產需求匹配',
+          '🔧 充足的技術支援覆蓋範圍'
+        ]
+      } else if (has5x8) {
+        level = 'conditional'
+        recommendation = '⚠️ 基本適用'
+        color = '#f57c00'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 夜班時段風險可控',
+          '🔧 基本技術支援已足夠'
+        ]
+      } else {
+        level = 'basic'
+        recommendation = '⚠️ 最低需求'
+        color = '#ff9800'
+        items = [
+          `💰 成本考量：${breakEvenHours.toFixed(1)} 小時停機即抵消節省`,
+          '⚖️ 服務等級偏低，適合風險承受度高的環境'
+        ]
+      }
+    } else {
+      if (has5x8) {
+        level = 'excellent'
+        recommendation = '✅ 完全適用'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 服務時間與工作時間完美匹配',
+          '💡 成本效益最佳化的選擇'
+        ]
+      } else {
+        level = 'basic'
+        recommendation = '✅ 基本適用'
+        color = '#4caf50'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⚖️ 基本服務滿足標準班制需求'
+        ]
+      }
+    }
+    
+    return { level, recommendation, color, items }
+  }
   const exportToPDF = async () => {
     try {
       const element = document.getElementById('comparison-table-container')
