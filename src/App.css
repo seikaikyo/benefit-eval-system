@@ -702,4 +702,65 @@ body {
   .config-panel {
     padding: 15px;
   }
+
+  .export-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Export Button styles */
+.export-buttons {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.export-buttons h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 180px;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.export-info {
+  text-align: left;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.export-info p {
+  margin: 5px 0;
+}
+
+.export-info strong {
+  color: #333;
+  font-size: 14px;
 }

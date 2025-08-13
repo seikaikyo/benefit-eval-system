@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
+import PDFQuote from './PDFQuote'
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
   // 智能分析服務適用性 (從 ComparisonTable 複製過來)
   const analyzeServiceSuitability = (category, type) => {
     const service = serviceDetails[category][type]
@@ -110,6 +112,61 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     
     return { level, recommendation, color, items }
   }
+
+  const exportPDFQuote = async () => {
+    try {
+      // 顯示PDF預覽
+      setShowPDFPreview(true)
+      
+      // 等待DOM更新
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      const element = document.getElementById('pdf-quote-container')
+      if (!element) {
+        alert('PDF預覽載入失敗，請稍後再試')
+        setShowPDFPreview(false)
+        return
+      }
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: element.scrollHeight
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      
+      const imgWidth = 210 // A4寬度
+      const pageHeight = 297 // A4高度
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+      let position = 0
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+
+      const fileName = `${companyInfo.companyName}_WISE-IoT_SRP維運服務報價書_${companyInfo.quoteDate.replace(/\//g, '')}.pdf`
+      pdf.save(fileName)
+      
+      // 隱藏PDF預覽
+      setShowPDFPreview(false)
+    } catch (error) {
+      console.error('PDF報價書匯出失敗:', error)
+      alert('PDF報價書匯出失敗，請稍後再試')
+      setShowPDFPreview(false)
+    }
+  }
   const exportToPDF = async () => {
     try {
       const element = document.getElementById('comparison-table-container')
@@ -183,58 +240,44 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['平台與應用層', '', '', '']
       ]
 
-      // 動態生成平台服務項目
-      const maxPlatformFeatures = Math.max(
-        serviceDetails.platform.basic.features.length,
-        serviceDetails.platform.advanced.features.length,
-        serviceDetails.platform.premium.features.length
-      )
+      // 動態生成平台服務項目 - 按名稱匹配
+      const allPlatformFeatures = new Set([
+        ...serviceDetails.platform.basic.features,
+        ...serviceDetails.platform.advanced.features,
+        ...serviceDetails.platform.premium.features
+      ])
 
-      for (let i = 0; i < maxPlatformFeatures; i++) {
-        const basicFeature = serviceDetails.platform.basic.features[i] || ''
-        const advancedFeature = serviceDetails.platform.advanced.features[i] || ''
-        const premiumFeature = serviceDetails.platform.premium.features[i] || ''
-        
-        // 使用第一個有內容的feature作為項目名稱
-        const featureName = basicFeature || advancedFeature || premiumFeature
-        
-        if (featureName) {
+      allPlatformFeatures.forEach(featureName => {
+        if (featureName && featureName.trim()) {
           serviceComparisonData.push([
             featureName,
-            basicFeature ? '✓' : '✗',
-            advancedFeature ? '✓' : '✗',
-            premiumFeature ? '✓' : '✗'
+            serviceDetails.platform.basic.features.includes(featureName) ? '✓' : '✗',
+            serviceDetails.platform.advanced.features.includes(featureName) ? '✓' : '✗',
+            serviceDetails.platform.premium.features.includes(featureName) ? '✓' : '✗'
           ])
         }
-      }
+      })
 
       serviceComparisonData.push([''])
       serviceComparisonData.push(['硬體基礎層', '', '', ''])
 
-      // 動態生成硬體服務項目
-      const maxHardwareFeatures = Math.max(
-        serviceDetails.hardware.basic.features.length,
-        serviceDetails.hardware.advanced.features.length,
-        serviceDetails.hardware.premium.features.length
-      )
+      // 動態生成硬體服務項目 - 按名稱匹配
+      const allHardwareFeatures = new Set([
+        ...serviceDetails.hardware.basic.features,
+        ...serviceDetails.hardware.advanced.features,
+        ...serviceDetails.hardware.premium.features
+      ])
 
-      for (let i = 0; i < maxHardwareFeatures; i++) {
-        const basicFeature = serviceDetails.hardware.basic.features[i] || ''
-        const advancedFeature = serviceDetails.hardware.advanced.features[i] || ''
-        const premiumFeature = serviceDetails.hardware.premium.features[i] || ''
-        
-        // 使用第一個有內容的feature作為項目名稱
-        const featureName = basicFeature || advancedFeature || premiumFeature
-        
-        if (featureName) {
+      allHardwareFeatures.forEach(featureName => {
+        if (featureName && featureName.trim()) {
           serviceComparisonData.push([
             featureName,
-            basicFeature ? '✓' : '✗',
-            advancedFeature ? '✓' : '✗',
-            premiumFeature ? '✓' : '✗'
+            serviceDetails.hardware.basic.features.includes(featureName) ? '✓' : '✗',
+            serviceDetails.hardware.advanced.features.includes(featureName) ? '✓' : '✗',
+            serviceDetails.hardware.premium.features.includes(featureName) ? '✓' : '✗'
           ])
         }
-      }
+      })
 
       serviceComparisonData.push([''])
       serviceComparisonData.push(['年度價格 (新台幣)', '', '', ''])
@@ -317,23 +360,125 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   }
 
   return (
-    <div className="export-buttons">
-      <h3>📤 匯出報價書</h3>
-      <div className="button-group">
-        <button 
-          className="export-btn excel-btn" 
-          onClick={exportToExcel}
-          title="匯出標準服務對照表格式的維運服務報價書"
-        >
-          📊 匯出 Excel 報價書
-        </button>
+    <>
+      <div className="export-buttons">
+        <h3>📤 匯出報價書</h3>
+        <div className="button-group">
+          <button 
+            className="export-btn pdf-btn" 
+            onClick={exportPDFQuote}
+            title="匯出A4格式的完整PDF報價書"
+            style={{
+              background: 'linear-gradient(135deg, #e53935, #c62828)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              marginRight: '15px',
+              boxShadow: '0 4px 12px rgba(229, 57, 53, 0.3)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            📄 匯出 PDF 報價書
+          </button>
+          
+          <button 
+            className="export-btn excel-btn" 
+            onClick={exportToExcel}
+            title="匯出標準服務對照表格式的維運服務報價書"
+            style={{
+              background: 'linear-gradient(135deg, #2e7d32, #1b5e20)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            📊 匯出 Excel 報價書
+          </button>
+        </div>
+        <div className="export-info">
+          <div style={{ marginBottom: '10px' }}>
+            <strong>📄 PDF報價書：</strong>
+            <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>• A4格式完整報價書，直接傳給客戶</p>
+            <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>• 包含服務對照、成本分析和專業建議</p>
+          </div>
+          <div>
+            <strong>📊 Excel報價書：</strong>
+            <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>• 分頁詳細資料，便於編輯分析</p>
+            <p style={{ margin: '5px 0', fontSize: '13px', color: '#666' }}>• 包含客戶資訊、服務對照、成本效益分析和適用性建議</p>
+          </div>
+        </div>
       </div>
-      <div className="export-info">
-        <p>• 包含完整服務功能對照表</p>
-        <p>• 客戶資訊與成本效益分析</p>
-        <p>• Excel格式便於轉換PDF或後續編輯</p>
-      </div>
-    </div>
+      
+      {/* PDF預覽模式 */}
+      {showPDFPreview && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.8)',
+          zIndex: 9999,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'auto'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '20px',
+            borderRadius: '10px',
+            maxWidth: '90%',
+            maxHeight: '90%',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setShowPDFPreview(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '30px',
+                height: '30px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                zIndex: 10000
+              }}
+            >
+              ×
+            </button>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '15px',
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              正在產生PDF報價書...
+            </div>
+            <PDFQuote 
+              companyInfo={companyInfo}
+              serviceDetails={serviceDetails}
+              shiftPatterns={shiftPatterns}
+            />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

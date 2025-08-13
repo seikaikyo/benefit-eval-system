@@ -25,55 +25,45 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const generateFeatureRows = () => {
     const rows = []
     
-    // 平台服務項目
-    const maxPlatformFeatures = Math.max(
-      serviceDetails.platform.basic.features.length,
-      serviceDetails.platform.advanced.features.length,
-      serviceDetails.platform.premium.features.length
-    )
+    // 收集所有不重複的功能項目名稱
+    const allPlatformFeatures = new Set([
+      ...serviceDetails.platform.basic.features,
+      ...serviceDetails.platform.advanced.features,
+      ...serviceDetails.platform.premium.features
+    ])
 
-    for (let i = 0; i < maxPlatformFeatures; i++) {
-      const basicFeature = serviceDetails.platform.basic.features[i] || ''
-      const advancedFeature = serviceDetails.platform.advanced.features[i] || ''
-      const premiumFeature = serviceDetails.platform.premium.features[i] || ''
-      
-      const featureName = basicFeature || advancedFeature || premiumFeature
-      
-      if (featureName) {
+    // 平台服務項目 - 按名稱匹配
+    allPlatformFeatures.forEach(featureName => {
+      if (featureName && featureName.trim()) {
         rows.push({
           type: 'platform',
           name: featureName,
-          basic: basicFeature ? '✓' : '✗',
-          advanced: advancedFeature ? '✓' : '✗',
-          premium: premiumFeature ? '✓' : '✗'
+          basic: serviceDetails.platform.basic.features.includes(featureName) ? '✓' : '✗',
+          advanced: serviceDetails.platform.advanced.features.includes(featureName) ? '✓' : '✗',
+          premium: serviceDetails.platform.premium.features.includes(featureName) ? '✓' : '✗'
         })
       }
-    }
+    })
 
-    // 硬體服務項目
-    const maxHardwareFeatures = Math.max(
-      serviceDetails.hardware.basic.features.length,
-      serviceDetails.hardware.advanced.features.length,
-      serviceDetails.hardware.premium.features.length
-    )
+    // 收集所有不重複的硬體功能項目名稱
+    const allHardwareFeatures = new Set([
+      ...serviceDetails.hardware.basic.features,
+      ...serviceDetails.hardware.advanced.features,
+      ...serviceDetails.hardware.premium.features
+    ])
 
-    for (let i = 0; i < maxHardwareFeatures; i++) {
-      const basicFeature = serviceDetails.hardware.basic.features[i] || ''
-      const advancedFeature = serviceDetails.hardware.advanced.features[i] || ''
-      const premiumFeature = serviceDetails.hardware.premium.features[i] || ''
-      
-      const featureName = basicFeature || advancedFeature || premiumFeature
-      
-      if (featureName) {
+    // 硬體服務項目 - 按名稱匹配
+    allHardwareFeatures.forEach(featureName => {
+      if (featureName && featureName.trim()) {
         rows.push({
           type: 'hardware',
           name: featureName,
-          basic: basicFeature ? '✓' : '✗',
-          advanced: advancedFeature ? '✓' : '✗',
-          premium: premiumFeature ? '✓' : '✗'
+          basic: serviceDetails.hardware.basic.features.includes(featureName) ? '✓' : '✗',
+          advanced: serviceDetails.hardware.advanced.features.includes(featureName) ? '✓' : '✗',
+          premium: serviceDetails.hardware.premium.features.includes(featureName) ? '✓' : '✗'
         })
       }
-    }
+    })
 
     return rows
   }
@@ -218,34 +208,42 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               return (
                 <>
                   {/* 平台與應用層分組 */}
-                  <tr style={{background: '#e3f2fd'}}>
-                    <td colSpan="4" style={{fontWeight: 'bold', color: '#1976d2', padding: '10px'}}>
-                      平台與應用層
-                    </td>
-                  </tr>
-                  {platformRows.map((row, index) => (
-                    <tr key={`platform-${index}`}>
-                      <td>{row.name}</td>
-                      <td style={{textAlign: 'center'}}>{row.basic}</td>
-                      <td style={{textAlign: 'center'}}>{row.advanced}</td>
-                      <td style={{textAlign: 'center'}}>{row.premium}</td>
-                    </tr>
-                  ))}
+                  {platformRows.length > 0 && (
+                    <>
+                      <tr style={{background: '#e3f2fd'}}>
+                        <td colSpan="4" style={{fontWeight: 'bold', color: '#1976d2', padding: '10px'}}>
+                          平台與應用層
+                        </td>
+                      </tr>
+                      {platformRows.map((row, index) => (
+                        <tr key={`platform-${index}`}>
+                          <td>{row.name}</td>
+                          <td style={{textAlign: 'center', color: row.basic === '✓' ? '#4caf50' : '#f44336'}}>{row.basic}</td>
+                          <td style={{textAlign: 'center', color: row.advanced === '✓' ? '#4caf50' : '#f44336'}}>{row.advanced}</td>
+                          <td style={{textAlign: 'center', color: row.premium === '✓' ? '#4caf50' : '#f44336'}}>{row.premium}</td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
                   
                   {/* 硬體基礎層分組 */}
-                  <tr style={{background: '#f3e5f5'}}>
-                    <td colSpan="4" style={{fontWeight: 'bold', color: '#9c27b0', padding: '10px'}}>
-                      硬體基礎層
-                    </td>
-                  </tr>
-                  {hardwareRows.map((row, index) => (
-                    <tr key={`hardware-${index}`}>
-                      <td>{row.name}</td>
-                      <td style={{textAlign: 'center'}}>{row.basic}</td>
-                      <td style={{textAlign: 'center'}}>{row.advanced}</td>
-                      <td style={{textAlign: 'center'}}>{row.premium}</td>
-                    </tr>
-                  ))}
+                  {hardwareRows.length > 0 && (
+                    <>
+                      <tr style={{background: '#f3e5f5'}}>
+                        <td colSpan="4" style={{fontWeight: 'bold', color: '#9c27b0', padding: '10px'}}>
+                          硬體基礎層
+                        </td>
+                      </tr>
+                      {hardwareRows.map((row, index) => (
+                        <tr key={`hardware-${index}`}>
+                          <td>{row.name}</td>
+                          <td style={{textAlign: 'center', color: row.basic === '✓' ? '#4caf50' : '#f44336'}}>{row.basic}</td>
+                          <td style={{textAlign: 'center', color: row.advanced === '✓' ? '#4caf50' : '#f44336'}}>{row.advanced}</td>
+                          <td style={{textAlign: 'center', color: row.premium === '✓' ? '#4caf50' : '#f44336'}}>{row.premium}</td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
                 </>
               )
             })()}
