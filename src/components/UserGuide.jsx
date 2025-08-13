@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 const UserGuide = () => {
   const [activeSection, setActiveSection] = useState('basic')
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true) // 預設為摺疊狀態
 
   const sections = {
     basic: {

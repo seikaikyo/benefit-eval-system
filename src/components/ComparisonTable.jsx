@@ -279,7 +279,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       <div className="summary-box">
         <h3>💰 停機風險成本分析</h3>
         
-        {/* 基礎營收數據 */}
+        {/* 班別資訊和基礎營收數據 */}
         <div style={{
           border: '2px solid #e0e0e0', 
           borderRadius: '10px', 
@@ -288,6 +288,27 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           background: 'white',
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
         }}>
+          {/* 班別資訊顯示 */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '20px',
+            padding: '15px',
+            background: `linear-gradient(135deg, ${
+              shiftPatterns[companyInfo.shiftPattern].workingHours >= 24 ? '#ff5722, #d84315' :
+              shiftPatterns[companyInfo.shiftPattern].workingHours >= 12 ? '#ff9800, #f57c00' :
+              '#4caf50, #388e3c'
+            })`,
+            borderRadius: '10px',
+            color: 'white'
+          }}>
+            <h4 style={{margin: '0 0 8px 0', fontWeight: '600'}}>
+              🏭 {shiftPatterns[companyInfo.shiftPattern].name}
+            </h4>
+            <p style={{margin: '0', fontSize: '14px', opacity: 0.9}}>
+              工作時間：{shiftPatterns[companyInfo.shiftPattern].workingHours}小時/天 | 
+              風險係數：{(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+            </p>
+          </div>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'center'}}>
             <div style={{border: '2px solid #2196f3', padding: '18px', borderRadius: '8px', background: 'white'}}>
               <p style={{margin: '5px 0', fontSize: '14px', color: '#666', fontWeight: '500'}}>年營業額</p>
@@ -303,11 +324,19 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </div>
           </div>
           <div style={{textAlign: 'center', marginTop: '20px', padding: '12px', border: '2px dashed #ff9800', borderRadius: '8px', background: 'white'}}>
-            <span style={{color: '#ef6c00', fontWeight: '600'}}>⚠️ {shiftPatterns[companyInfo.shiftPattern].workingHours >= 16 ? '夜班故障警示無人處理，可能延誤' + Math.round(24 - shiftPatterns[companyInfo.shiftPattern].workingHours + 2) + '小時以上造成損失' : '非工作時間故障風險，可能延誤' + Math.round(16 - shiftPatterns[companyInfo.shiftPattern].workingHours) + '小時處理'}</span>
+            <span style={{color: '#ef6c00', fontWeight: '600'}}>
+              ⚠️ {shiftPatterns[companyInfo.shiftPattern].name}：
+              {shiftPatterns[companyInfo.shiftPattern].workingHours >= 24 
+                ? '連續生產，系統停機影響重大，建議7*24全時段支援' 
+                : shiftPatterns[companyInfo.shiftPattern].workingHours >= 12
+                ? '兩班制生產，夜間故障風險需考慮，建議至少5*8+預防維護'
+                : '標準班制，工作時間外故障延誤風險可控，5*8支援已足夠'
+              }
+            </span>
           </div>
         </div>
 
-        {/* 停機時間損失計算 */}
+        {/* 停機時間損失計算 - 考慮班別風險係數 */}
         <div style={{
           border: '2px solid #e0e0e0',
           borderRadius: '10px',
@@ -316,20 +345,40 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           background: 'white',
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
         }}>
-          <h4 style={{margin: '0 0 20px 0', color: '#444', fontWeight: '600'}}>⚠️ 停機風險成本分析</h4>
+          <h4 style={{margin: '0 0 20px 0', color: '#444', fontWeight: '600'}}>⚠️ 停機風險成本分析（已含班別風險係數）</h4>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px'}}>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ffc107', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>2小時停機</p>
-              <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 2}萬</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>
+                損失{Math.round(calculateHourlyRevenue() * 2 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+              </p>
+              <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
+                基本損失{calculateHourlyRevenue() * 2}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+              </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ff9800', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>4小時停機</p>
-              <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 4}萬</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>
+                損失{Math.round(calculateHourlyRevenue() * 4 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+              </p>
+              <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
+                基本損失{calculateHourlyRevenue() * 4}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+              </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #f44336', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>8小時停機</p>
-              <p style={{margin: '0', fontSize: '20px', color: '#f44336', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 8}萬</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#f44336', fontWeight: 'bold'}}>
+                損失{Math.round(calculateHourlyRevenue() * 8 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+              </p>
+              <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
+                基本損失{calculateHourlyRevenue() * 8}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+              </p>
             </div>
+          </div>
+          <div style={{textAlign: 'center', marginTop: '15px', padding: '10px', background: '#f8f9fa', borderRadius: '8px'}}>
+            <small style={{color: '#666'}}>
+              💡 {shiftPatterns[companyInfo.shiftPattern].name}的風險係數會影響實際損失計算，連續生產環境風險係數更高
+            </small>
           </div>
         </div>
 
