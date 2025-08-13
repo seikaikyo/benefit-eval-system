@@ -174,10 +174,18 @@ export const queryCompanyInfo = async (taxId) => {
         fetchOptions.mode = api.corsMode
       }
       
+      console.log(`正在請求: ${url}`)
+      console.log(`請求選項:`, fetchOptions)
+      
       const response = await fetch(url, fetchOptions)
+      
+      console.log(`${api.name} HTTP 狀態:`, response.status, response.statusText)
+      console.log(`${api.name} Headers:`, Object.fromEntries(response.headers.entries()))
       
       if (!response.ok) {
         console.log(`${api.name} API 回應錯誤:`, response.status, response.statusText)
+        const errorText = await response.text()
+        console.log(`錯誤內容:`, errorText)
         continue
       }
       
