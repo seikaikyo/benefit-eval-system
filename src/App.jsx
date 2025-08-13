@@ -169,25 +169,34 @@ function App() {
 
   return (
     <div className="App">
-      <div className="container">
-        <UserGuide />
-        <ConfigPanel 
-          companyInfo={companyInfo}
-          setCompanyInfo={setCompanyInfo}
-          serviceDetails={serviceDetails}
-          setServiceDetails={setServiceDetails}
-          shiftPatterns={shiftPatterns}
-        />
-        <ComparisonTable 
-          companyInfo={companyInfo}
-          serviceDetails={serviceDetails}
-          shiftPatterns={shiftPatterns}
-        />
-        <ExportButtons 
-          companyInfo={companyInfo}
-          serviceDetails={serviceDetails}
-          shiftPatterns={shiftPatterns}
-        />
+      <div className="main-layout">
+        {/* 左側使用指南 */}
+        <div className="sidebar">
+          <UserGuide />
+        </div>
+        
+        {/* 主要內容區域 */}
+        <div className="main-content">
+          <div className="container">
+            <ConfigPanel 
+              companyInfo={companyInfo}
+              setCompanyInfo={setCompanyInfo}
+              serviceDetails={serviceDetails}
+              setServiceDetails={setServiceDetails}
+              shiftPatterns={shiftPatterns}
+            />
+            <ComparisonTable 
+              companyInfo={companyInfo}
+              serviceDetails={serviceDetails}
+              shiftPatterns={shiftPatterns}
+            />
+            <ExportButtons 
+              companyInfo={companyInfo}
+              serviceDetails={serviceDetails}
+              shiftPatterns={shiftPatterns}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

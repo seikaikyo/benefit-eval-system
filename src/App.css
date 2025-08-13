@@ -1,14 +1,38 @@
 body {
   font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: 0;
   background-color: #f8f9fa;
   line-height: 1.6;
 }
 
 .App {
-  max-width: 1400px;
-  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.main-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1600px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 350px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 1200px;
 }
 
 .container {
@@ -706,6 +730,34 @@ body {
   .export-btn {
     width: 100%;
     max-width: 300px;
+  }
+}
+
+/* 響應式布局 */
+@media (max-width: 1200px) {
+  .main-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    position: relative;
+    max-height: none;
+    margin-bottom: 20px;
+  }
+  
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+  
+  .main-layout {
+    gap: 15px;
   }
 }
 

@@ -6,7 +6,7 @@ const TAX_ID_APIS = [
     name: '台灣公司資料查詢',
     url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
     corsMode: 'no-cors',
-    parse: (data) => {
+    parse: (data, cleanTaxId) => {
       try {
         if (data && Array.isArray(data) && data.length > 0) {
           const company = data.find(c => c.Business_Accounting_NO === cleanTaxId) || data[0]
@@ -127,7 +127,7 @@ export const queryCompanyInfo = async (taxId) => {
       const data = await response.json()
       console.log(`${api.name} 回應數據:`, data)
       
-      const result = api.parse(data)
+      const result = api.parse(data, cleanTaxId)
       if (result.success) {
         return {
           success: true,
@@ -178,6 +178,18 @@ const localCompanyDatabase = {
     representative: '蔡明介',
     phone: '03-5670766'
   },
+  '22466564': {
+    companyName: '台新國際商業銀行股份有限公司',
+    address: '台北市中山區中山北路二段44號',
+    representative: '林克孝',
+    phone: '02-25681599'
+  },
+  '22099131': {
+    companyName: '富邦金融控股股份有限公司',
+    address: '台北市松山區敦化南路一段108號',
+    representative: '蔡明興',
+    phone: '02-87716699'
+  },
   '12345678': {
     companyName: '示範科技股份有限公司',
     address: '台北市信義區信義路四段199號',
@@ -211,11 +223,11 @@ const queryFromLocalDatabase = (taxId) => {
   }
 }
 
-// 格式化統編顯示
+// 格式化統編顯示 - 不再使用"-"分隔符，保持完整8位數字格式
 export const formatTaxId = (taxId) => {
   const clean = taxId.replace(/\D/g, '')
   if (clean.length === 8) {
-    return clean.replace(/(\d{4})(\d{4})/, '$1-$2')
+    return clean
   }
   return taxId
 }

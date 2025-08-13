@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 const UserGuide = () => {
   const [activeSection, setActiveSection] = useState('basic')
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const sections = {
     basic: {
@@ -120,38 +121,65 @@ const UserGuide = () => {
     <div style={{
       background: 'white',
       borderRadius: '10px',
-      padding: '25px',
+      padding: isCollapsed ? '15px' : '25px',
       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-      marginBottom: '25px'
+      transition: 'all 0.3s ease',
+      height: 'fit-content'
     }}>
-      <h2 style={{
-        margin: '0 0 20px 0',
-        color: '#333',
-        fontSize: '20px',
-        fontWeight: 'bold',
-        textAlign: 'center'
-      }}>
-        📚 WISE-IoT SRP 維運服務評估系統使用指南
-      </h2>
-
-      {/* 導航選項卡 */}
       <div style={{
         display: 'flex',
-        gap: '10px',
-        marginBottom: '25px',
-        borderBottom: '2px solid #f0f0f0',
-        paddingBottom: '10px',
-        flexWrap: 'wrap'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: isCollapsed ? '0' : '20px'
       }}>
+        <h2 style={{
+          margin: '0',
+          color: '#333',
+          fontSize: isCollapsed ? '16px' : '20px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s ease'
+        }}>
+          {isCollapsed ? '📚 使用指南' : '📚 WISE-IoT SRP 維運服務評估系統使用指南'}
+        </h2>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            fontSize: '18px',
+            cursor: 'pointer',
+            padding: '5px',
+            borderRadius: '4px',
+            transition: 'all 0.3s ease',
+            color: '#666'
+          }}
+          onMouseEnter={(e) => e.target.style.background = '#f0f0f0'}
+          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+          title={isCollapsed ? '展開使用指南' : '收起使用指南'}
+        >
+          {isCollapsed ? '▶️' : '◀️'}
+        </button>
+      </div>
+
+      {/* 導航選項卡 */}
+      {!isCollapsed && (
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '20px',
+          borderBottom: '2px solid #f0f0f0',
+          paddingBottom: '10px',
+          flexWrap: 'wrap'
+        }}>
         {Object.entries(sections).map(([key, section]) => (
           <button
             key={key}
             onClick={() => setActiveSection(key)}
             style={{
-              padding: '8px 16px',
+              padding: '6px 12px',
               border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
+              borderRadius: '4px',
+              fontSize: '12px',
               fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
@@ -162,15 +190,17 @@ const UserGuide = () => {
             {section.title}
           </button>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* 內容區域 */}
-      <div style={{
-        padding: '20px',
-        background: '#fafafa',
-        borderRadius: '8px',
-        border: '1px solid #e0e0e0'
-      }}>
+      {!isCollapsed && (
+        <div style={{
+          padding: '15px',
+          background: '#fafafa',
+          borderRadius: '8px',
+          border: '1px solid #e0e0e0'
+        }}>
         <h3 style={{
           margin: '0 0 20px 0',
           color: '#1976d2',
@@ -281,7 +311,8 @@ const UserGuide = () => {
           如有任何使用問題，歡迎聯繫研華科技客服團隊<br />
           或參考系統右上角的操作提示
         </p>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
