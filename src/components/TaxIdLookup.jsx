@@ -36,27 +36,29 @@ const TaxIdLookup = ({ onCompanyInfoFound }) => {
     try {
       const result = await queryCompanyInfo(taxId)
       
-      if (result.success) {
+      if (result.success && result.data) {
         setMessage(`✅ 成功查詢到公司資訊 (來源: ${result.data.apiSource})`)
         setMessageType('success')
         
         // 回調父組件，自動填入公司資訊
         onCompanyInfoFound({
-          companyName: result.data.companyName,
-          address: result.data.address,
-          contact: result.data.representative,
-          taxId: result.data.taxId,
+          companyName: result.data.companyName || '',
+          address: result.data.address || '',
+          contact: result.data.representative || '',
+          taxId: result.data.taxId || taxId,
           phone: result.data.phone || ''
         })
         
         // 格式化統編顯示
-        setTaxId(formatTaxId(result.data.taxId))
+        setTaxId(formatTaxId(result.data.taxId || taxId))
       } else {
-        setMessage(`❌ ${result.error}`)
+        setMessage(`❌ ${result.error || '查無此統編資料，請手動輸入相關資訊'}`)
         setMessageType('error')
+        // 查詢失敗時不自動填入任何資訊
       }
     } catch (error) {
-      setMessage(`❌ 查詢失敗: ${error.message}`)
+      console.error('統編查詢錯誤:', error)
+      setMessage(`❌ 查詢失敗: 網路連線問題或服務異常，請手動輸入公司資訊`)
       setMessageType('error')
     } finally {
       setIsLoading(false)

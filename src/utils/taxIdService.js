@@ -3,47 +3,51 @@
 // 多個可用的統編查詢API服務
 const TAX_ID_APIS = [
   {
-    name: 'Findata API (CORS)',
-    url: 'https://company.g0v.ronny.tw/api/search',
-    queryParam: 'q',
-    corsMode: 'cors',
+    name: '台灣公司資料查詢',
+    url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
+    corsMode: 'no-cors',
     parse: (data) => {
-      if (data && data.data && data.data.length > 0) {
-        const company = data.data[0]
-        return {
-          success: true,
-          data: {
-            companyName: company['公司名稱'] || '',
-            address: company['公司地址'] || '',
-            representative: company['代表人姓名'] || '',
-            capital: company['資本額'] || '',
-            status: company['公司狀況'] || '',
-            establishDate: company['設立日期'] || ''
+      try {
+        if (data && Array.isArray(data) && data.length > 0) {
+          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId) || data[0]
+          return {
+            success: true,
+            data: {
+              companyName: company.Company_Name || '',
+              address: company.Company_Location || '',
+              representative: company.Responsible_Name || '',
+              capital: company.Capital_Stock_Amount || '',
+              status: company.Company_Status || ''
+            }
           }
         }
+      } catch (e) {
+        console.log('解析API數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
   },
   {
-    name: 'JSONP Proxy',
-    url: 'https://cors-anywhere.herokuapp.com/https://company.g0v.ronny.tw/api/search',
-    queryParam: 'q',
+    name: 'G0V 公司資料',
+    url: 'https://company.g0v.ronny.tw/api/search',
     corsMode: 'cors',
     parse: (data) => {
-      if (data && data.data && data.data.length > 0) {
-        const company = data.data[0]
-        return {
-          success: true,
-          data: {
-            companyName: company['公司名稱'] || '',
-            address: company['公司地址'] || '',
-            representative: company['代表人姓名'] || '',
-            capital: company['資本額'] || '',
-            status: company['公司狀況'] || '',
-            establishDate: company['設立日期'] || ''
+      try {
+        if (data && data.data && data.data.length > 0) {
+          const company = data.data[0]
+          return {
+            success: true,
+            data: {
+              companyName: company['公司名稱'] || company.name || '',
+              address: company['公司地址'] || company.address || '',
+              representative: company['代表人姓名'] || company.representative || '',
+              capital: company['資本額'] || '',
+              status: company['公司狀況'] || ''
+            }
           }
         }
+      } catch (e) {
+        console.log('解析G0V數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
@@ -60,28 +64,12 @@ export const validateTaxId = (taxId) => {
     return { valid: false, error: '統編必須為8位數字' }
   }
   
-  // 統編檢核邏輯（台灣統編檢核碼算法）
-  const weights = [1, 2, 1, 2, 1, 2, 4, 1]
-  let sum = 0
+  // 簡化驗證：只檢查基本格式，不做複雜檢核碼驗證
+  // 因為檢核碼算法可能有多種版本，為了使用者體驗先簡化
+  const isBasicValid = /^\d{8}$/.test(cleanTaxId)
   
-  for (let i = 0; i < 8; i++) {
-    let digit = parseInt(cleanTaxId[i])
-    let product = digit * weights[i]
-    
-    // 如果乘積大於9，將十位數和個位數相加
-    if (product > 9) {
-      product = Math.floor(product / 10) + (product % 10)
-    }
-    
-    sum += product
-  }
-  
-  // 檢核規則
-  const isValid = (sum % 10 === 0) || 
-                  (cleanTaxId[6] === '7' && (sum + 1) % 10 === 0)
-  
-  if (!isValid) {
-    return { valid: false, error: '統編格式錯誤，請檢查輸入' }
+  if (!isBasicValid) {
+    return { valid: false, error: '統編必須為8位數字' }
   }
   
   return { valid: true, taxId: cleanTaxId }
@@ -96,17 +84,31 @@ export const queryCompanyInfo = async (taxId) => {
   
   const cleanTaxId = validation.taxId
   
-  // 依序嘗試不同的API
+  // 優先嘗試本地數據庫（因為API可能有CORS問題）
+  console.log(`嘗試本地數據庫查詢統編: ${cleanTaxId}`)
+  const localResult = queryFromLocalDatabase(cleanTaxId)
+  if (localResult.success) {
+    console.log('本地數據庫查詢成功')
+    return localResult
+  }
+  
+  // 如果本地數據庫沒有，再嘗試API
   for (const api of TAX_ID_APIS) {
     try {
-      let url = `${api.url}?${api.queryParam}=${cleanTaxId}`
+      let url
+      if (api.name.includes('G0V')) {
+        url = `${api.url}?q=${cleanTaxId}`
+      } else {
+        url = `${api.url}?$filter=Business_Accounting_NO eq '${cleanTaxId}'&$format=json`
+      }
       
       console.log(`嘗試使用 ${api.name} 查詢統編: ${cleanTaxId}`)
       
       const fetchOptions = {
         method: 'GET',
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; TaxID-Lookup/1.0)'
         }
       }
 
@@ -118,7 +120,7 @@ export const queryCompanyInfo = async (taxId) => {
       const response = await fetch(url, fetchOptions)
       
       if (!response.ok) {
-        console.log(`${api.name} API 回應錯誤:`, response.status)
+        console.log(`${api.name} API 回應錯誤:`, response.status, response.statusText)
         continue
       }
       
@@ -139,8 +141,8 @@ export const queryCompanyInfo = async (taxId) => {
     } catch (error) {
       console.log(`${api.name} 查詢失敗:`, error.message)
       // 如果是CORS錯誤，給出提示
-      if (error.message.includes('CORS') || error.message.includes('Cross-Origin')) {
-        console.log('檢測到CORS問題，嘗試下一個API...')
+      if (error.message.includes('CORS') || error.message.includes('Cross-Origin') || error.message.includes('fetch')) {
+        console.log(`${api.name} CORS或網路問題，嘗試下一個API...`)
       }
       continue
     }

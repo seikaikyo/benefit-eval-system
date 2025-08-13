@@ -3,15 +3,16 @@ import './App.css'
 import ComparisonTable from './components/ComparisonTable'
 import ConfigPanel from './components/ConfigPanel'
 import ExportButtons from './components/ExportButtons'
+import UserGuide from './components/UserGuide'
 
 function App() {
   const [companyInfo, setCompanyInfo] = useState({
-    companyName: '鈺祥企業股份有限公司',
-    address: '741007台南市善化區小新營300號',
-    contact: '黃彥凱',
-    taxId: '2246656',
-    phone: '02-2225-7858',
-    fax: '02-2225-0107',
+    companyName: '',
+    address: '',
+    contact: '',
+    taxId: '',
+    phone: '',
+    fax: '',
     quoteDate: new Date().toISOString().slice(0, 10),
     validDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
     annualRevenue: 150000, // 改為萬元
@@ -169,6 +170,7 @@ function App() {
   return (
     <div className="App">
       <div className="container">
+        <UserGuide />
         <ConfigPanel 
           companyInfo={companyInfo}
           setCompanyInfo={setCompanyInfo}
