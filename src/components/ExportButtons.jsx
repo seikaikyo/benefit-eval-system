@@ -3,7 +3,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
 
-const ExportButtons = ({ companyInfo, services }) => {
+const ExportButtons = ({ companyInfo, serviceDetails }) => {
   const exportToPDF = async () => {
     try {
       const element = document.getElementById('comparison-table-container')
@@ -51,44 +51,61 @@ const ExportButtons = ({ companyInfo, services }) => {
       const companyData = [
         ['項目', '內容'],
         ['公司名稱', companyInfo.companyName],
+        ['聯絡地址', companyInfo.address],
+        ['聯絡人', companyInfo.contact],
+        ['統一編號', companyInfo.taxId],
+        ['電話', companyInfo.phone],
+        ['傳真', companyInfo.fax],
         ['報價日期', companyInfo.quoteDate],
         ['有效期限', companyInfo.validDate],
-        ['年營業額', `NT$ ${companyInfo.annualRevenue.toLocaleString()}`],
+        ['年營業額 (萬元)', companyInfo.annualRevenue],
+        ['年營業額 (新台幣)', `NT$ ${(companyInfo.annualRevenue * 10000).toLocaleString()}`],
         ['特殊需求', companyInfo.specialRequirements]
       ]
       const companyWS = XLSX.utils.aoa_to_sheet(companyData)
       XLSX.utils.book_append_sheet(workbook, companyWS, '公司資訊')
 
-      // 服務價格工作表
+      // 服務詳細工作表
       const servicesData = [
-        ['服務類型', '方案', '基礎價格', '權重係數', '調整後價格', '啟用狀態'],
-        ...Object.entries(services.platform).map(([type, config]) => [
+        ['服務類型', '方案', '產品編號', '服務標題', '價格', '啟用狀態', '服務項目']
+      ]
+      
+      Object.entries(serviceDetails.platform).forEach(([type, config]) => {
+        servicesData.push([
           '平台與應用層',
           `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
+          config.productCode,
+          config.title,
           config.price,
-          config.weight,
-          config.price * config.weight,
-          config.enabled ? '是' : '否'
-        ]),
-        ...Object.entries(services.hardware).map(([type, config]) => [
+          config.enabled ? '是' : '否',
+          config.features.join('; ')
+        ])
+      })
+      
+      Object.entries(serviceDetails.hardware).forEach(([type, config]) => {
+        servicesData.push([
           '硬體基礎層',
           `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
+          config.productCode,
+          config.title,
           config.price,
-          config.weight,
-          config.price * config.weight,
-          config.enabled ? '是' : '否'
+          config.enabled ? '是' : '否',
+          config.features.join('; ')
         ])
-      ]
+      })
+      
       const servicesWS = XLSX.utils.aoa_to_sheet(servicesData)
-      XLSX.utils.book_append_sheet(workbook, servicesWS, '服務價格')
+      XLSX.utils.book_append_sheet(workbook, servicesWS, '服務詳細')
 
       // 成本效益分析工作表
-      const dailyRevenue = Math.floor(companyInfo.annualRevenue / 365)
-      const hourlyRevenue = Math.floor(companyInfo.annualRevenue / 365 / 24)
+      const annualRevenueNT = companyInfo.annualRevenue * 10000
+      const dailyRevenue = Math.floor(annualRevenueNT / 365)
+      const hourlyRevenue = Math.floor(annualRevenueNT / 365 / 24)
       
       const costBenefitData = [
         ['項目', '數值'],
-        ['年營業額', companyInfo.annualRevenue],
+        ['年營業額 (萬元)', companyInfo.annualRevenue],
+        ['年營業額 (新台幣)', annualRevenueNT],
         ['日營業額', dailyRevenue],
         ['時營業額', hourlyRevenue],
         ['', ''],
@@ -98,9 +115,9 @@ const ExportButtons = ({ companyInfo, services }) => {
         ['8小時', hourlyRevenue * 8],
         ['', ''],
         ['方案組合', '年度成本'],
-        ['Basic + Basic', (services.platform.basic.enabled ? services.platform.basic.price * services.platform.basic.weight : 0) + (services.hardware.basic.enabled ? services.hardware.basic.price * services.hardware.basic.weight : 0)],
-        ['Advanced + Advanced', (services.platform.advanced.enabled ? services.platform.advanced.price * services.platform.advanced.weight : 0) + (services.hardware.advanced.enabled ? services.hardware.advanced.price * services.hardware.advanced.weight : 0)],
-        ['Premium + Premium', (services.platform.premium.enabled ? services.platform.premium.price * services.platform.premium.weight : 0) + (services.hardware.premium.enabled ? services.hardware.premium.price * services.hardware.premium.weight : 0)]
+        ['Basic + Basic', (serviceDetails.platform.basic.enabled ? serviceDetails.platform.basic.price : 0) + (serviceDetails.hardware.basic.enabled ? serviceDetails.hardware.basic.price : 0)],
+        ['Advanced + Advanced', (serviceDetails.platform.advanced.enabled ? serviceDetails.platform.advanced.price : 0) + (serviceDetails.hardware.advanced.enabled ? serviceDetails.hardware.advanced.price : 0)],
+        ['Premium + Premium', (serviceDetails.platform.premium.enabled ? serviceDetails.platform.premium.price : 0) + (serviceDetails.hardware.premium.enabled ? serviceDetails.hardware.premium.price : 0)]
       ]
       const costBenefitWS = XLSX.utils.aoa_to_sheet(costBenefitData)
       XLSX.utils.book_append_sheet(workbook, costBenefitWS, '成本效益分析')
