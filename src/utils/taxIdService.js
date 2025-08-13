@@ -3,14 +3,15 @@
 // 多個可用的統編查詢API服務
 const TAX_ID_APIS = [
   {
-    name: '台灣公司資料查詢API',
-    url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
+    name: 'OpenData VIP 統編查詢API',
+    url: 'https://opendata.vip/data/company',
     corsMode: 'cors',
     parse: (data, cleanTaxId) => {
       try {
-        console.log('政府API原始回應:', data)
-        if (data && Array.isArray(data) && data.length > 0) {
-          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId)
+        console.log('OpenData VIP API原始回應:', data)
+        if (data && data.output && Array.isArray(data.output) && data.output.length > 0) {
+          // 尋找完全匹配的統編
+          const company = data.output.find(c => c.Business_Accounting_NO === cleanTaxId) || data.output[0]
           if (company) {
             return {
               success: true,
@@ -20,13 +21,14 @@ const TAX_ID_APIS = [
                 representative: company.Responsible_Name || '',
                 capital: company.Capital_Stock_Amount || '',
                 status: company.Company_Status || '',
-                establishDate: company.Company_Setup_Date || ''
+                establishDate: company.Company_Setup_Date || '',
+                businessItem: company.Cmp_Business || ''
               }
             }
           }
         }
       } catch (e) {
-        console.log('解析政府API數據失敗:', e)
+        console.log('解析OpenData VIP數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
@@ -60,27 +62,30 @@ const TAX_ID_APIS = [
     }
   },
   {
-    name: '第三方查詢API',
-    url: 'https://api.finmind.tech/api/v4/data',
+    name: '台灣政府公開資料API',
+    url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
     corsMode: 'cors',
     parse: (data, cleanTaxId) => {
       try {
-        console.log('第三方API原始回應:', data)
-        if (data && data.data && data.data.length > 0) {
-          const company = data.data.find(c => c.tax_id === cleanTaxId) || data.data[0]
-          return {
-            success: true,
-            data: {
-              companyName: company.company_name || '',
-              address: company.address || '',
-              representative: company.representative || '',
-              capital: company.capital || '',
-              status: company.status || ''
+        console.log('政府API原始回應:', data)
+        if (data && Array.isArray(data) && data.length > 0) {
+          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId)
+          if (company) {
+            return {
+              success: true,
+              data: {
+                companyName: company.Company_Name || '',
+                address: company.Company_Location || '',
+                representative: company.Responsible_Name || '',
+                capital: company.Capital_Stock_Amount || '',
+                status: company.Company_Status || '',
+                establishDate: company.Company_Setup_Date || ''
+              }
             }
           }
         }
       } catch (e) {
-        console.log('解析第三方數據失敗:', e)
+        console.log('解析政府API數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
@@ -124,10 +129,10 @@ export const queryCompanyInfo = async (taxId) => {
   for (const api of TAX_ID_APIS) {
     try {
       let url
-      if (api.name.includes('G0V')) {
+      if (api.name.includes('OpenData VIP')) {
+        url = `${api.url}?keyword=${cleanTaxId}`
+      } else if (api.name.includes('G0V')) {
         url = `${api.url}?q=${cleanTaxId}`
-      } else if (api.name.includes('第三方')) {
-        url = `${api.url}?dataset=TaiwanStockInfo&data_id=${cleanTaxId}`
       } else {
         // 台灣政府API
         url = `${api.url}?$filter=Business_Accounting_NO eq '${cleanTaxId}'&$format=json`
