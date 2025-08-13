@@ -285,6 +285,87 @@ const UserGuide = () => {
           </div>
         </div>
       )}
+
+      {/* 操作手冊 */}
+      {!isCollapsed && (
+        <div style={{
+          marginTop: '20px',
+          background: 'white',
+          borderRadius: '8px',
+          border: '1px solid #e0e0e0',
+          overflow: 'hidden'
+        }}>
+          {Object.entries(sections).map(([sectionKey, section]) => (
+            <details key={sectionKey} style={{ margin: 0 }}>
+              <summary style={{
+                background: '#f5f5f5',
+                padding: '12px 16px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '13px',
+                color: '#333',
+                borderBottom: '1px solid #e0e0e0'
+              }}>
+                {section.title}
+              </summary>
+              <div style={{ padding: '16px' }}>
+                {section.content.map((item, index) => (
+                  <div key={index} style={{
+                    marginBottom: index < section.content.length - 1 ? '16px' : 0,
+                    paddingBottom: index < section.content.length - 1 ? '16px' : 0,
+                    borderBottom: index < section.content.length - 1 ? '1px solid #f0f0f0' : 'none'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <span style={{
+                        fontSize: '16px',
+                        marginRight: '8px'
+                      }}>
+                        {item.image}
+                      </span>
+                      <strong style={{
+                        color: '#333',
+                        fontSize: '13px'
+                      }}>
+                        {item.step}
+                      </strong>
+                    </div>
+                    <p style={{
+                      margin: '0 0 8px 24px',
+                      fontSize: '12px',
+                      color: '#666',
+                      lineHeight: '1.4'
+                    }}>
+                      {item.description}
+                    </p>
+                    <div style={{ marginLeft: '24px' }}>
+                      {item.tips.map((tip, tipIndex) => (
+                        <div key={tipIndex} style={{
+                          fontSize: '11px',
+                          color: '#888',
+                          marginBottom: '3px',
+                          paddingLeft: '8px',
+                          position: 'relative'
+                        }}>
+                          <span style={{
+                            position: 'absolute',
+                            left: 0,
+                            color: '#ccc'
+                          }}>•</span>
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -160,11 +160,12 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
               />
             </label>
             <label>
-              傳真:
+              Email:
               <input 
-                type="text" 
-                value={companyInfo.fax}
-                onChange={(e) => handleCompanyInfoChange('fax', e.target.value)}
+                type="email" 
+                value={companyInfo.email}
+                onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
+                placeholder="company@example.com"
               />
             </label>
           </div>

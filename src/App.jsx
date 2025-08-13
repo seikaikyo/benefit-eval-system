@@ -12,7 +12,7 @@ function App() {
     contact: '',
     taxId: '',
     phone: '',
-    fax: '',
+    email: '',
     quoteDate: new Date().toISOString().slice(0, 10),
     validDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
     annualRevenue: 150000, // 改為萬元

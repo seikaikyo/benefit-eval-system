@@ -220,7 +220,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['聯絡人', companyInfo.contact],
         ['統一編號', companyInfo.taxId],
         ['電話', companyInfo.phone],
-        ['傳真', companyInfo.fax],
+        ['Email', companyInfo.email],
         ['報價日期', companyInfo.quoteDate],
         ['有效期限', companyInfo.validDate],
         [''],
