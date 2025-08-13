@@ -6,7 +6,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   }
 
   const calculateHourlyRevenue = () => {
-    return Math.floor(companyInfo.annualRevenue * 10000 / 365 / 24 / 10000)
+    return Math.round(companyInfo.annualRevenue * 10000 / 365 / 24)
   }
 
   const formatPrice = (price) => {
@@ -19,6 +19,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     const hardwarePrice = serviceDetails.hardware[hardwareType].enabled ? 
       serviceDetails.hardware[hardwareType].price : 0
     return platformPrice + hardwarePrice
+  }
+
+  const calculateDowntimeRisk = (hours) => {
+    const riskMultiplier = shiftPatterns[companyInfo.shiftPattern].riskMultiplier || 1
+    return Math.round(calculateHourlyRevenue() * hours * riskMultiplier)
   }
 
   // 動態生成服務功能對照表
@@ -295,6 +300,116 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </table>
       </div>
 
+      {/* 班別風險分析 */}
+      <div style={{ marginBottom: '25px' }}>
+        <h3 style={{
+          fontSize: '16px',
+          color: '#1976d2',
+          margin: '0 0 15px 0',
+          borderBottom: '1px solid #e0e0e0',
+          paddingBottom: '8px'
+        }}>
+          🏭 班別風險分析
+        </h3>
+        
+        <div style={{
+          border: '2px solid #2196f3',
+          borderRadius: '8px',
+          padding: '15px',
+          background: '#f3f8ff',
+          marginBottom: '15px'
+        }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '15px',
+            marginBottom: '15px'
+          }}>
+            <div>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>生產模式</div>
+              <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#1976d2' }}>
+                {shiftPatterns[companyInfo.shiftPattern].name}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>風險係數</div>
+              <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f44336' }}>
+                {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>時營業額</div>
+              <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4caf50' }}>
+                {(calculateHourlyRevenue() / 10000).toFixed(1)}萬
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ 
+            fontSize: '11px', 
+            color: '#666', 
+            lineHeight: '1.4',
+            borderTop: '1px solid #e0e0e0',
+            paddingTop: '10px'
+          }}>
+            {shiftPatterns[companyInfo.shiftPattern].description}
+          </div>
+        </div>
+
+        {/* 停機風險成本分析 */}
+        <h4 style={{ 
+          fontSize: '14px', 
+          color: '#f44336',
+          margin: '0 0 10px 0',
+          fontWeight: '600'
+        }}>
+          ⚠️ 停機損失計算（含班別風險係數）
+        </h4>
+        
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '10px',
+          fontSize: '11px'
+        }}>
+          <div style={{
+            border: '1px solid #ff9800',
+            borderRadius: '6px',
+            padding: '10px',
+            background: '#fff3e0'
+          }}>
+            <div style={{ fontWeight: 'bold', color: '#f57c00', marginBottom: '5px' }}>2小時停機</div>
+            <div style={{ marginBottom: '3px' }}>
+              基本損失：{(calculateHourlyRevenue() * 2 / 10000).toFixed(1)}萬
+            </div>
+            <div style={{ marginBottom: '3px' }}>
+              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+            </div>
+            <div style={{ fontWeight: 'bold', color: '#f57c00' }}>
+              總損失：{(calculateDowntimeRisk(2) / 10000).toFixed(1)}萬
+            </div>
+          </div>
+          
+          <div style={{
+            border: '1px solid #f44336',
+            borderRadius: '6px',
+            padding: '10px',
+            background: '#ffebee'
+          }}>
+            <div style={{ fontWeight: 'bold', color: '#d32f2f', marginBottom: '5px' }}>4小時停機</div>
+            <div style={{ marginBottom: '3px' }}>
+              基本損失：{(calculateHourlyRevenue() * 4 / 10000).toFixed(1)}萬
+            </div>
+            <div style={{ marginBottom: '3px' }}>
+              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+            </div>
+            <div style={{ fontWeight: 'bold', color: '#d32f2f' }}>
+              總損失：{(calculateDowntimeRisk(4) / 10000).toFixed(1)}萬
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 成本效益分析 */}
       <div style={{ marginBottom: '25px' }}>
         <h3 style={{
@@ -304,7 +419,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           borderBottom: '1px solid #e0e0e0',
           paddingBottom: '8px'
         }}>
-          💰 成本效益分析
+          💰 投資回報分析
         </h3>
         
         <div style={{
