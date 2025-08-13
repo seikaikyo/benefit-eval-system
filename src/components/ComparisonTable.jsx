@@ -480,61 +480,6 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           </div>
         </div>
 
-        {/* 最終建議 - 動態生成Premium方案優勢 */}
-        <div style={{
-          border: '2px solid #4caf50',
-          borderRadius: '10px',
-          padding: '25px',
-          marginTop: '25px',
-          background: 'white',
-          boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)'
-        }}>
-          <h4 style={{margin: '0 0 20px 0', color: '#4caf50', fontWeight: '600'}}>🎯 Premium方案核心優勢</h4>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
-            <div>
-              <h5 style={{margin: '0 0 15px 0', color: '#4caf50', fontSize: '14px', fontWeight: '600'}}>🖥️ 平台與應用層 Premium</h5>
-              {serviceDetails.platform.premium.features.slice(0, Math.ceil(serviceDetails.platform.premium.features.length/2)).map((feature, index) => (
-                <div key={`platform-${index}`} style={{margin: '8px 0', display: 'flex', alignItems: 'center', padding: '8px', border: '1px solid #e8f5e8', borderRadius: '6px'}}>
-                  <span style={{color: '#4caf50', marginRight: '10px', fontSize: '16px'}}>✓</span>
-                  <span style={{fontSize: '13px', color: '#666'}}>{feature}</span>
-                </div>
-              ))}
-            </div>
-            <div>
-              <h5 style={{margin: '0 0 15px 0', color: '#9c27b0', fontSize: '14px', fontWeight: '600'}}>🔧 硬體基礎層 Premium</h5>
-              {serviceDetails.hardware.premium.features.slice(0, Math.ceil(serviceDetails.hardware.premium.features.length/2)).map((feature, index) => (
-                <div key={`hardware-${index}`} style={{margin: '8px 0', display: 'flex', alignItems: 'center', padding: '8px', border: '1px solid #f3e5f5', borderRadius: '6px'}}>
-                  <span style={{color: '#9c27b0', marginRight: '10px', fontSize: '16px'}}>✓</span>
-                  <span style={{fontSize: '13px', color: '#666'}}>{feature}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* 如果有剩餘功能，顯示在下方 */}
-          {(serviceDetails.platform.premium.features.length + serviceDetails.hardware.premium.features.length > 6) && (
-            <div style={{marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #e0e0e0'}}>
-              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
-                <div>
-                  {serviceDetails.platform.premium.features.slice(Math.ceil(serviceDetails.platform.premium.features.length/2)).map((feature, index) => (
-                    <div key={`platform-extra-${index}`} style={{margin: '8px 0', display: 'flex', alignItems: 'center', padding: '8px', border: '1px solid #e8f5e8', borderRadius: '6px'}}>
-                      <span style={{color: '#4caf50', marginRight: '10px', fontSize: '16px'}}>✓</span>
-                      <span style={{fontSize: '13px', color: '#666'}}>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  {serviceDetails.hardware.premium.features.slice(Math.ceil(serviceDetails.hardware.premium.features.length/2)).map((feature, index) => (
-                    <div key={`hardware-extra-${index}`} style={{margin: '8px 0', display: 'flex', alignItems: 'center', padding: '8px', border: '1px solid #f3e5f5', borderRadius: '6px'}}>
-                      <span style={{color: '#9c27b0', marginRight: '10px', fontSize: '16px'}}>✓</span>
-                      <span style={{fontSize: '13px', color: '#666'}}>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   )
