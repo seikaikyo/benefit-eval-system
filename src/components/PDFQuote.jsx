@@ -173,7 +173,9 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         <table style={{
           width: '100%',
           borderCollapse: 'collapse',
-          fontSize: '11px'
+          fontSize: '11px',
+          pageBreakInside: 'auto', // 允許表格內部分頁
+          breakInside: 'auto'
         }}>
           <thead>
             <tr>

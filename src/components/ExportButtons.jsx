@@ -128,51 +128,53 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         return
       }
       
+      // 簡單有效的PDF生成方法
       const canvas = await html2canvas(element, {
-        scale: 1.5, // 適度提高解析度但不過高避免記憶體問題
+        scale: 1.2, // 適中的解析度
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: 794,
         height: element.scrollHeight,
-        logging: false, // 關閉日誌避免控制台雜訊
-        removeContainer: true, // 清理容器
-        imageTimeout: 15000, // 增加圖像超時時間
-        onclone: function(clonedDoc) {
-          // 確保克隆文件的樣式正確應用
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            * { 
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-            }
-            .page-break { 
-              page-break-before: always !important; 
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
+        logging: false,
+        removeContainer: true,
+        imageTimeout: 20000 // 增加超時時間
       })
 
-      const imgData = canvas.toDataURL('image/png', 0.95) // 輕微壓縮減少檔案大小
+      const imgData = canvas.toDataURL('image/png', 0.9)
       const pdf = new jsPDF('p', 'mm', 'a4')
       
-      const imgWidth = 210 // A4寬度(mm)
-      const pageHeight = 297 // A4高度(mm) 
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-      let heightLeft = imgHeight
-      let position = 0
-
-      // 添加第一頁
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
-
-      // 如果內容超過一頁，添加後續頁面
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight
-        pdf.addPage()
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
+      const pageWidth = 210 // A4寬度(mm)
+      const pageHeight = 297 // A4高度(mm)
+      const imgWidth = pageWidth
+      const imgHeight = (canvas.height * pageWidth) / canvas.width
+      
+      // 計算需要多少頁
+      const totalPages = Math.ceil(imgHeight / pageHeight)
+      
+      // 為每一頁添加對應的圖片部分
+      for (let i = 0; i < totalPages; i++) {
+        if (i > 0) {
+          pdf.addPage()
+        }
+        
+        const sourceY = i * pageHeight * (canvas.height / imgHeight)
+        const sourceHeight = Math.min(pageHeight * (canvas.height / imgHeight), canvas.height - sourceY)
+        const destHeight = (sourceHeight / canvas.height) * imgHeight
+        
+        // 使用圖片的裁剪功能
+        pdf.addImage(
+          imgData,
+          'PNG',
+          0,
+          0,
+          imgWidth,
+          destHeight,
+          `page-${i}`,
+          'FAST',
+          0,
+          sourceY / canvas.height
+        )
       }
 
       const fileName = `${companyInfo.companyName}_WISE-IoT_SRP維運服務報價書_${companyInfo.quoteDate.replace(/\//g, '')}.pdf`
