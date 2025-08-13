@@ -216,6 +216,8 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['年營業額 (新台幣)', annualRevenueNT],
         ['日營業額', dailyRevenue],
         ['時營業額', hourlyRevenue],
+        ['生產班別', shiftPatterns[companyInfo.shiftPattern].name],
+        ['班別描述', shiftPatterns[companyInfo.shiftPattern].description],
         ['', ''],
         ['停機時間', '損失金額'],
         ['2小時', hourlyRevenue * 2],
@@ -229,6 +231,38 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       ]
       const costBenefitWS = XLSX.utils.aoa_to_sheet(costBenefitData)
       XLSX.utils.book_append_sheet(workbook, costBenefitWS, '成本效益分析')
+
+      // 智能適用性分析工作表
+      const suitabilityData = [
+        ['服務類型', '方案', '適用性評級', '推薦狀態', '分析要點']
+      ]
+      
+      // 平台服務分析
+      ['basic', 'advanced', 'premium'].forEach(type => {
+        const analysis = analyzeServiceSuitability('platform', type)
+        suitabilityData.push([
+          '平台與應用層',
+          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
+          analysis.level,
+          analysis.recommendation,
+          analysis.items.join(' | ')
+        ])
+      })
+      
+      // 硬體服務分析
+      ['basic', 'advanced', 'premium'].forEach(type => {
+        const analysis = analyzeServiceSuitability('hardware', type)
+        suitabilityData.push([
+          '硬體基礎層',
+          `${type.charAt(0).toUpperCase() + type.slice(1)} MA`,
+          analysis.level,
+          analysis.recommendation,
+          analysis.items.join(' | ')
+        ])
+      })
+      
+      const suitabilityWS = XLSX.utils.aoa_to_sheet(suitabilityData)
+      XLSX.utils.book_append_sheet(workbook, suitabilityWS, '智能適用性分析')
 
       const fileName = `${companyInfo.companyName}_效益評估數據_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
       XLSX.writeFile(workbook, fileName)
