@@ -287,8 +287,10 @@ const UserGuide = () => {
           ))}
         </div>
       </div>
+      )}
 
       {/* 快速聯絡資訊 */}
+      {!isCollapsed && (
       <div style={{
         marginTop: '25px',
         padding: '15px',
