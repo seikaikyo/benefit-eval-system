@@ -138,6 +138,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           <div><strong>統一編號：</strong>{companyInfo.taxId}</div>
           <div><strong>聯絡人：</strong>{companyInfo.contact}</div>
           <div><strong>電話：</strong>{companyInfo.phone}</div>
+          <div><strong>Email：</strong>{companyInfo.email}</div>
           <div style={{gridColumn: '1 / -1'}}><strong>地址：</strong>{companyInfo.address}</div>
           <div><strong>年營業額：</strong>{(companyInfo.annualRevenue / 10000).toFixed(1)}億台幣</div>
           <div><strong>生產模式：</strong>{shiftPatterns[companyInfo.shiftPattern].name}</div>
