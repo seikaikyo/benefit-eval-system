@@ -12,8 +12,8 @@ function App() {
     taxId: '2246656',
     phone: '02-2225-7858',
     fax: '02-2225-0107',
-    quoteDate: '2025/08/12',
-    validDate: '2025/09/12',
+    quoteDate: new Date().toISOString().slice(0, 10),
+    validDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
     annualRevenue: 150000, // 改為萬元
     specialRequirements: '24小時四班二輪制生產環境',
     shiftPattern: '24hours' // 新增班別模式
