@@ -230,8 +230,11 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               {['basic', 'advanced', 'premium'].map(type => {
                 const analysis = analyzeServiceSuitability('platform', type)
                 return (
-                  <td key={`platform-${type}`} className="platform-col" style={{background: analysis.level === 'excellent' ? '#e8f5e8' : analysis.level === 'conditional' ? '#fff3e0' : analysis.level === 'disabled' ? '#f5f5f5' : '#ffebee'}}>
-                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold'}}>{analysis.recommendation}</div>
+                  <td key={`platform-${type}`} className="platform-col" style={{
+                    border: `2px solid ${analysis.level === 'excellent' ? '#4caf50' : analysis.level === 'conditional' ? '#ff9800' : analysis.level === 'disabled' ? '#9e9e9e' : '#f44336'}`,
+                    background: 'white'
+                  }}>
+                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold', padding: '5px', borderRadius: '4px', background: analysis.level === 'excellent' ? '#f1f8e9' : analysis.level === 'conditional' ? '#fff8e1' : analysis.level === 'disabled' ? '#fafafa' : '#ffebee'}}>{analysis.recommendation}</div>
                     {analysis.items.map((item, index) => (
                       <div key={index} className="feature-item">{item}</div>
                     ))}
@@ -241,8 +244,11 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               {['basic', 'advanced', 'premium'].map(type => {
                 const analysis = analyzeServiceSuitability('hardware', type)
                 return (
-                  <td key={`hardware-${type}`} className="hardware-col" style={{background: analysis.level === 'excellent' ? '#e8f5e8' : analysis.level === 'conditional' ? '#fff3e0' : analysis.level === 'disabled' ? '#f5f5f5' : '#ffebee'}}>
-                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold'}}>{analysis.recommendation}</div>
+                  <td key={`hardware-${type}`} className="hardware-col" style={{
+                    border: `2px solid ${analysis.level === 'excellent' ? '#4caf50' : analysis.level === 'conditional' ? '#ff9800' : analysis.level === 'disabled' ? '#9e9e9e' : '#f44336'}`,
+                    background: 'white'
+                  }}>
+                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold', padding: '5px', borderRadius: '4px', background: analysis.level === 'excellent' ? '#f1f8e9' : analysis.level === 'conditional' ? '#fff8e1' : analysis.level === 'disabled' ? '#fafafa' : '#ffebee'}}>{analysis.recommendation}</div>
                     {analysis.items.map((item, index) => (
                       <div key={index} className="feature-item">{item}</div>
                     ))}
@@ -255,44 +261,188 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       </div>
 
       <div className="summary-box">
-        <h3>基於年營業額{(companyInfo.annualRevenue / 10000).toFixed(1)}億的成本效益分析</h3>
+        <h3>💰 停機風險成本分析</h3>
         
-        <div style={{background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)', padding: '20px', borderRadius: '8px', marginBottom: '20px', color: 'white'}}>
-          <h4 style={{margin: '0 0 15px 0'}}>💰 停機成本 vs 維運成本計算</h4>
+        {/* 基礎營收數據 */}
+        <div style={{
+          border: '2px solid #2196f3', 
+          borderRadius: '8px', 
+          padding: '20px', 
+          marginBottom: '20px',
+          background: 'linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%)'
+        }}>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'center'}}>
-            <div style={{background: 'rgba(255,255,255,0.15)', padding: '15px', borderRadius: '6px'}}>
-              <p style={{margin: '5px 0', fontSize: '16px', fontWeight: 'bold'}}>年營業額</p>
-              <p style={{margin: '0', fontSize: '24px', color: '#ffeb3b'}}>{(companyInfo.annualRevenue / 10000).toFixed(1)}億</p>
+            <div style={{border: '1px solid #2196f3', padding: '15px', borderRadius: '6px', background: 'white'}}>
+              <p style={{margin: '5px 0', fontSize: '14px', color: '#1976d2', fontWeight: 'bold'}}>年營業額</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#d32f2f', fontWeight: 'bold'}}>{(companyInfo.annualRevenue / 10000).toFixed(1)}億</p>
             </div>
-            <div style={{background: 'rgba(255,255,255,0.15)', padding: '15px', borderRadius: '6px'}}>
-              <p style={{margin: '5px 0', fontSize: '16px', fontWeight: 'bold'}}>日營業額</p>
-              <p style={{margin: '0', fontSize: '24px', color: '#ffeb3b'}}>{calculateDailyRevenue()}萬</p>
+            <div style={{border: '1px solid #2196f3', padding: '15px', borderRadius: '6px', background: 'white'}}>
+              <p style={{margin: '5px 0', fontSize: '14px', color: '#1976d2', fontWeight: 'bold'}}>日營業額</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>{calculateDailyRevenue()}萬</p>
             </div>
-            <div style={{background: 'rgba(255,255,255,0.15)', padding: '15px', borderRadius: '6px'}}>
-              <p style={{margin: '5px 0', fontSize: '16px', fontWeight: 'bold'}}>時營業額</p>
-              <p style={{margin: '0', fontSize: '24px', color: '#ffeb3b'}}>{calculateHourlyRevenue()}萬</p>
+            <div style={{border: '1px solid #2196f3', padding: '15px', borderRadius: '6px', background: 'white'}}>
+              <p style={{margin: '5px 0', fontSize: '14px', color: '#1976d2', fontWeight: 'bold'}}>時營業額</p>
+              <p style={{margin: '0', fontSize: '20px', color: '#ff5722', fontWeight: 'bold'}}>{calculateHourlyRevenue()}萬</p>
+            </div>
+          </div>
+          <div style={{textAlign: 'center', marginTop: '15px', padding: '10px', border: '1px dashed #ff5722', borderRadius: '5px', background: '#fff3e0'}}>
+            <span style={{color: '#e65100', fontWeight: 'bold'}}>⚠️ 表班故障警示無人處理，可能延誤4小時以上造成損失</span>
+          </div>
+        </div>
+
+        {/* 停機時間損失計算 */}
+        <div style={{
+          border: '2px solid #ff9800',
+          borderRadius: '8px',
+          padding: '20px',
+          marginBottom: '20px',
+          background: 'linear-gradient(135deg, #fffbf3 0%, #fff8e1 100%)'
+        }}>
+          <h4 style={{margin: '0 0 15px 0', color: '#e65100'}}>⚠️ 停機風險成本分析</h4>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px'}}>
+            <div style={{textAlign: 'center', padding: '15px', border: '1px solid #ffcc02', borderRadius: '6px', background: '#fffde7'}}>
+              <p style={{margin: '5px 0', fontSize: '16px', color: '#f57c00', fontWeight: 'bold'}}>2小時停機</p>
+              <p style={{margin: '0', fontSize: '18px', color: '#d84315', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 2}萬</p>
+            </div>
+            <div style={{textAlign: 'center', padding: '15px', border: '1px solid #ff6f00', borderRadius: '6px', background: '#fff3e0'}}>
+              <p style={{margin: '5px 0', fontSize: '16px', color: '#f57c00', fontWeight: 'bold'}}>4小時停機</p>
+              <p style={{margin: '0', fontSize: '18px', color: '#d84315', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 4}萬</p>
+            </div>
+            <div style={{textAlign: 'center', padding: '15px', border: '1px solid #e65100', borderRadius: '6px', background: '#fbe9e7'}}>
+              <p style={{margin: '5px 0', fontSize: '16px', color: '#f57c00', fontWeight: 'bold'}}>8小時停機</p>
+              <p style={{margin: '0', fontSize: '18px', color: '#d84315', fontWeight: 'bold'}}>損失{calculateHourlyRevenue() * 8}萬</p>
             </div>
           </div>
         </div>
 
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginTop: '15px'}}>
-          <div className="summary-item" style={{background: 'rgba(244, 67, 54, 0.2)'}}>
-            <h4>Basic MA 組合方案</h4>
-            <p><strong>年成本：{formatPrice(getCombinedPrice('basic', 'basic'))}</strong></p>
-            <p style={{color: '#d32f2f', fontWeight: 'bold'}}>❌ 高風險</p>
-            <p>僅5*8支援，對24小時生產環境風險過高。</p>
+        {/* 方案成本效益比較 */}
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '20px'}}>
+          {/* Basic方案 */}
+          <div style={{
+            border: '2px solid #f44336',
+            borderRadius: '8px',
+            padding: '15px',
+            background: '#ffebee'
+          }}>
+            <h4 style={{margin: '0 0 10px 0', color: '#c62828'}}>Basic MA 方案</h4>
+            <p style={{margin: '5px 0', fontWeight: 'bold'}}>年成本：{formatPrice(getCombinedPrice('basic', 'basic'))}</p>
+            <p style={{color: '#d32f2f', fontWeight: 'bold', margin: '5px 0'}}>❌ 高風險</p>
+            <p style={{margin: '5px 0', fontSize: '14px'}}>一次2小時停機損失({calculateHourlyRevenue() * 2}萬)就超過與Premium的差額，對15億營業面言風險太高。</p>
           </div>
-          <div className="summary-item" style={{background: 'rgba(255, 152, 0, 0.2)'}}>
-            <h4>Advanced MA 組合方案</h4>
-            <p><strong>年成本：{formatPrice(getCombinedPrice('advanced', 'advanced'))}</strong></p>
-            <p style={{color: '#f57c00', fontWeight: 'bold'}}>⚠️ 中等風險</p>
-            <p>有預防性維護但夜班故障風險仍存在。</p>
+
+          {/* Advanced方案 */}
+          <div style={{
+            border: '2px solid #ff9800',
+            borderRadius: '8px',
+            padding: '15px',
+            background: '#fff8e1'
+          }}>
+            <h4 style={{margin: '0 0 10px 0', color: '#f57c00'}}>Advanced MA 方案</h4>
+            <p style={{margin: '5px 0', fontWeight: 'bold'}}>年成本：{formatPrice(getCombinedPrice('advanced', 'advanced'))}</p>
+            <p style={{color: '#f57c00', fontWeight: 'bold', margin: '5px 0'}}>⚠️ 中等風險</p>
+            <p style={{margin: '5px 0', fontSize: '14px'}}>有預防維護但夜班故障風險仍存在，一次4小時停機損失可能超過年整體節省效益。</p>
           </div>
-          <div className="summary-item" style={{background: 'rgba(76, 175, 80, 0.2)'}}>
-            <h4>Premium MA 組合方案</h4>
-            <p><strong>年成本：{formatPrice(getCombinedPrice('premium', 'premium'))}</strong></p>
-            <p style={{color: '#2e7d32', fontWeight: 'bold'}}>✅ 最佳選擇</p>
-            <p>7*24支援，最適合關鍵生產環境。</p>
+
+          {/* Premium方案 */}
+          <div style={{
+            border: '2px solid #4caf50',
+            borderRadius: '8px',
+            padding: '15px',
+            background: '#e8f5e8'
+          }}>
+            <h4 style={{margin: '0 0 10px 0', color: '#2e7d32'}}>Premium MA 方案</h4>
+            <p style={{margin: '5px 0', fontWeight: 'bold'}}>年成本：{formatPrice(getCombinedPrice('premium', 'premium'))}</p>
+            <p style={{color: '#2e7d32', fontWeight: 'bold', margin: '5px 0'}}>✅ 最佳投資</p>
+            <p style={{margin: '5px 0', fontSize: '14px'}}>7*24支援，最適合連續性要求。成本僅佔年營業額0.067%，ROI極高。</p>
+          </div>
+        </div>
+
+        {/* Premium方案詳細優勢 */}
+        <div style={{
+          border: '2px solid #4caf50',
+          borderRadius: '8px',
+          padding: '20px',
+          background: 'linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)',
+          marginBottom: '20px'
+        }}>
+          <h4 style={{margin: '0 0 15px 0', color: '#2e7d32', textAlign: 'center'}}>🌟 Premium方案：最明智的投資決策</h4>
+          
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
+            <div>
+              <h5 style={{color: '#2e7d32', margin: '0 0 10px 0'}}>🎯 成本占比極低</h5>
+              <p style={{margin: '0', fontSize: '14px'}}>維護成本占年營業額僅{((getCombinedPrice('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100).toFixed(3)}%</p>
+              <p style={{margin: '5px 0', fontSize: '14px'}}>相當於每天投資{Math.round(getCombinedPrice('premium', 'premium') / 365).toLocaleString()}元獲得全方位保障</p>
+            </div>
+            
+            <div>
+              <h5 style={{color: '#2e7d32', margin: '0 0 10px 0'}}>⚡ 回本速度極快</h5>
+              <p style={{margin: '0', fontSize: '14px'}}>避免一次{(getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本</p>
+              <p style={{margin: '5px 0', fontSize: '14px'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPrice('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 成本對比總結 */}
+        <div style={{
+          border: '2px solid #673ab7',
+          borderRadius: '8px',
+          padding: '20px',
+          background: 'linear-gradient(135deg, #f8f5ff 0%, #ede7f6 100%)'
+        }}>
+          <h4 style={{margin: '0 0 15px 0', color: '#4527a0', textAlign: 'center'}}>📊 Premium方案年成本 vs 單次停機損失</h4>
+          <div style={{
+            textAlign: 'center',
+            padding: '15px',
+            border: '1px solid #9c27b0',
+            borderRadius: '6px',
+            background: 'white',
+            fontSize: '18px',
+            fontWeight: 'bold'
+          }}>
+            <span style={{color: '#4caf50'}}>{getCombinedPrice('premium', 'premium').toLocaleString()}萬建置成本</span>
+            <span style={{margin: '0 20px', color: '#666'}}>&lt;</span>
+            <span style={{color: '#f44336'}}>{Math.round((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)) * 24)}小時停機損失({Math.round(getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000) * 24 * calculateHourlyRevenue())}萬)</span>
+          </div>
+        </div>
+
+        {/* 最終建議 */}
+        <div style={{
+          border: '2px solid #4caf50',
+          borderRadius: '8px',
+          padding: '20px',
+          marginTop: '20px',
+          background: 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%)'
+        }}>
+          <h4 style={{margin: '0 0 15px 0', color: '#2e7d32'}}>🎯 Premium方案優勢總結</h4>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px'}}>
+            <div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>平台層：原廠專家諮詢</span>
+              </div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>硬體層：7*24全時段支援</span>
+              </div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>7*8到場服務優先等級</span>
+              </div>
+            </div>
+            <div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>專線電話先進維護</span>
+              </div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>預防性件更換最大化</span>
+              </div>
+              <div style={{margin: '5px 0', display: 'flex', alignItems: 'center'}}>
+                <span style={{color: '#4caf50', marginRight: '8px'}}>✓</span>
+                <span style={{fontSize: '14px'}}>業績優化調整指導</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

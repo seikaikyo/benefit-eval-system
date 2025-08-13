@@ -141,7 +141,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         heightLeft -= pageHeight
       }
 
-      const fileName = `${companyInfo.companyName}_效益評估_${companyInfo.quoteDate.replace(/\//g, '')}.pdf`
+      const fileName = `${companyInfo.companyName}_智能效益評估報告_V2.0_${companyInfo.quoteDate.replace(/\//g, '')}.pdf`
       pdf.save(fileName)
     } catch (error) {
       console.error('PDF export failed:', error)
@@ -314,7 +314,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       const recommendationWS = XLSX.utils.aoa_to_sheet(recommendationData)
       XLSX.utils.book_append_sheet(workbook, recommendationWS, '綜合建議')
 
-      const fileName = `${companyInfo.companyName}_效益評估數據_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
+      const fileName = `${companyInfo.companyName}_智能效益評估數據_V2.0_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
       XLSX.writeFile(workbook, fileName)
     } catch (error) {
       console.error('Excel export failed:', error)
