@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDetails }) => {
+const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDetails, shiftPatterns }) => {
   const handleCompanyInfoChange = (field, value) => {
     setCompanyInfo(prev => ({
       ...prev,
@@ -162,6 +162,22 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
               value={companyInfo.specialRequirements}
               onChange={(e) => handleCompanyInfoChange('specialRequirements', e.target.value)}
             />
+          </label>
+        </div>
+        
+        <div className="config-row">
+          <label>
+            生產班別模式:
+            <select 
+              value={companyInfo.shiftPattern}
+              onChange={(e) => handleCompanyInfoChange('shiftPattern', e.target.value)}
+            >
+              {Object.entries(shiftPatterns).map(([key, pattern]) => (
+                <option key={key} value={key}>
+                  {pattern.name} - {pattern.description}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
       </div>

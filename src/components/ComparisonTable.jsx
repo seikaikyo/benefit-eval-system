@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ComparisonTable = ({ companyInfo, serviceDetails }) => {
+const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const calculateDailyRevenue = () => {
     return Math.floor(companyInfo.annualRevenue * 10000 / 365 / 10000)
   }
@@ -19,6 +19,116 @@ const ComparisonTable = ({ companyInfo, serviceDetails }) => {
     const hardwarePrice = serviceDetails.hardware[hardwareType].enabled ? 
       serviceDetails.hardware[hardwareType].price : 0
     return platformPrice + hardwarePrice
+  }
+
+  // 智能分析服務適用性
+  const analyzeServiceSuitability = (category, type) => {
+    const service = serviceDetails[category][type]
+    if (!service.enabled) return { level: 'disabled', recommendation: '未啟用', color: '#9e9e9e', items: ['此方案未啟用'] }
+    
+    const features = service.features.join(' ').toLowerCase()
+    const currentShift = shiftPatterns[companyInfo.shiftPattern]
+    const annualRevenueNT = companyInfo.annualRevenue * 10000
+    const servicePrice = service.price
+    
+    // 分析關鍵字
+    const has24x7 = features.includes('7*24') || features.includes('24小時') || features.includes('全時段')
+    const has5x8 = features.includes('5*8') || features.includes('工作時間')
+    const hasInspection = features.includes('巡檢') || features.includes('定期') || features.includes('檢查')
+    const hasOnSite = features.includes('到場') || features.includes('現場') || features.includes('維修')
+    
+    // 計算停機損失 vs 服務成本比
+    const hourlyRevenue = annualRevenueNT / 365 / 24
+    const breakEvenHours = servicePrice / hourlyRevenue // 多少小時停機損失等於服務費用
+    
+    // 根據班別和服務特性評估
+    let level, recommendation, color, items = []
+    
+    if (currentShift.workingHours >= 24) {
+      // 24小時生產環境
+      if (has24x7 && hasOnSite && hasInspection) {
+        level = 'excellent'
+        recommendation = '✅ 強烈推薦'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '🔧 全時段技術支援，最適合連續生產',
+          '🚀 到場服務與預防性維護並重',
+          '⚡ 風險最小化，生產連續性最大化'
+        ]
+      } else if (has5x8 && hasInspection) {
+        level = 'conditional'
+        recommendation = '⚠️ 有條件適用'
+        color = '#f57c00'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 夜班時段仍有風險，需內部支援',
+          '🔍 有預防性維護，可降低故障機率',
+          '👥 建議：配備夜班技術人員'
+        ]
+      } else {
+        level = 'risky'
+        recommendation = '❌ 不建議'
+        color = '#d32f2f'
+        items = [
+          `💰 風險：單次 ${breakEvenHours.toFixed(1)} 小時停機損失就超過節省成本`,
+          '🚨 24小時生產但缺乏夜間支援',
+          '⚠️ 無預防性維護，故障風險高',
+          '💡 建議：升級到更高級別方案'
+        ]
+      }
+    } else if (currentShift.workingHours >= 12) {
+      // 12小時或兩班制
+      if (has24x7 || (has5x8 && hasInspection)) {
+        level = 'excellent'
+        recommendation = '✅ 推薦'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⚖️ 服務等級與生產需求匹配',
+          '🔧 充足的技術支援覆蓋範圍'
+        ]
+      } else if (has5x8) {
+        level = 'conditional'
+        recommendation = '⚠️ 基本適用'
+        color = '#f57c00'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 夜班時段風險可控',
+          '🔧 基本技術支援已足夠'
+        ]
+      } else {
+        level = 'basic'
+        recommendation = '⚠️ 最低需求'
+        color = '#ff9800'
+        items = [
+          `💰 成本考量：${breakEvenHours.toFixed(1)} 小時停機即抵消節省`,
+          '⚖️ 服務等級偏低，適合風險承受度高的環境'
+        ]
+      }
+    } else {
+      // 8小時標準班制
+      if (has5x8) {
+        level = 'excellent'
+        recommendation = '✅ 完全適用'
+        color = '#2e7d32'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⏰ 服務時間與工作時間完美匹配',
+          '💡 成本效益最佳化的選擇'
+        ]
+      } else {
+        level = 'basic'
+        recommendation = '✅ 基本適用'
+        color = '#4caf50'
+        items = [
+          `💰 成本效益：避免 ${breakEvenHours.toFixed(1)} 小時停機即可回本`,
+          '⚖️ 基本服務滿足標準班制需求'
+        ]
+      }
+    }
+    
+    return { level, recommendation, color, items }
   }
 
   return (
@@ -116,43 +226,29 @@ const ComparisonTable = ({ companyInfo, serviceDetails }) => {
             </tr>
 
             <tr>
-              <td className="category-header">24小時生產適用性</td>
-              <td className="platform-col" style={{background: '#ffebee'}}>
-                <div className="feature-item" style={{color: '#d32f2f', fontWeight: 'bold'}}>⚠️ 不建議</div>
-                <div className="feature-item">僅5*8支持，夜班發生問題無法即時處理</div>
-                <div className="feature-item">無定期巡檢，風險較高</div>
-                <div className="feature-item">適合：有強大內部維運團隊的環境</div>
-              </td>
-              <td className="platform-col" style={{background: '#fff3e0'}}>
-                <div className="feature-item" style={{color: '#f57c00', fontWeight: 'bold'}}>⚠️ 有條件適用</div>
-                <div className="feature-item">5*8支持，夜班仍有風險</div>
-                <div className="feature-item">有定期巡檢，可預防性發現問題</div>
-                <div className="feature-item">適合：有夜班維運人員的環境</div>
-              </td>
-              <td className="platform-col" style={{background: '#e8f5e8'}}>
-                <div className="feature-item" style={{color: '#2e7d32', fontWeight: 'bold'}}>✅ 強烈建議</div>
-                <div className="feature-item">5*8支持，但有專家諮詢服務</div>
-                <div className="feature-item">原廠專家可協助架構優化</div>
-                <div className="feature-item">適合：需要專業指導的連續生產</div>
-              </td>
-              <td className="hardware-col" style={{background: '#ffebee'}}>
-                <div className="feature-item" style={{color: '#d32f2f', fontWeight: 'bold'}}>⚠️ 不建議</div>
-                <div className="feature-item">僅5*8支持，夜班硬體故障風險高</div>
-                <div className="feature-item">無定期巡檢，預防性維護不足</div>
-                <div className="feature-item">適合：有備援系統的環境</div>
-              </td>
-              <td className="hardware-col" style={{background: '#fff3e0'}}>
-                <div className="feature-item" style={{color: '#f57c00', fontWeight: 'bold'}}>⚠️ 有條件適用</div>
-                <div className="feature-item">5*8支持，夜班硬體問題需自行處理</div>
-                <div className="feature-item">有預防性維護，降低故障機率</div>
-                <div className="feature-item">適合：有內部硬體維修能力</div>
-              </td>
-              <td className="hardware-col" style={{background: '#e8f5e8'}}>
-                <div className="feature-item" style={{color: '#2e7d32', fontWeight: 'bold'}}>✅ 強烈建議</div>
-                <div className="feature-item">7*24全時段技術支持</div>
-                <div className="feature-item">7*8到場服務，快速響應</div>
-                <div className="feature-item">最適合：關鍵連續生產環境</div>
-              </td>
+              <td className="category-header">{shiftPatterns[companyInfo.shiftPattern].name} 適用性分析</td>
+              {['basic', 'advanced', 'premium'].map(type => {
+                const analysis = analyzeServiceSuitability('platform', type)
+                return (
+                  <td key={`platform-${type}`} className="platform-col" style={{background: analysis.level === 'excellent' ? '#e8f5e8' : analysis.level === 'conditional' ? '#fff3e0' : analysis.level === 'disabled' ? '#f5f5f5' : '#ffebee'}}>
+                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold'}}>{analysis.recommendation}</div>
+                    {analysis.items.map((item, index) => (
+                      <div key={index} className="feature-item">{item}</div>
+                    ))}
+                  </td>
+                )
+              })}
+              {['basic', 'advanced', 'premium'].map(type => {
+                const analysis = analyzeServiceSuitability('hardware', type)
+                return (
+                  <td key={`hardware-${type}`} className="hardware-col" style={{background: analysis.level === 'excellent' ? '#e8f5e8' : analysis.level === 'conditional' ? '#fff3e0' : analysis.level === 'disabled' ? '#f5f5f5' : '#ffebee'}}>
+                    <div className="feature-item" style={{color: analysis.color, fontWeight: 'bold'}}>{analysis.recommendation}</div>
+                    {analysis.items.map((item, index) => (
+                      <div key={index} className="feature-item">{item}</div>
+                    ))}
+                  </td>
+                )
+              })}
             </tr>
           </tbody>
         </table>

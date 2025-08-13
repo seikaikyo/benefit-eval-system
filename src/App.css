@@ -112,12 +112,14 @@ body {
   color: #495057;
 }
 
-.config-row input {
+.config-row input,
+.config-row select {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 14px;
+  background: white;
 }
 
 /* Service Configuration */

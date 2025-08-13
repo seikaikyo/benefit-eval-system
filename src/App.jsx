@@ -15,7 +15,35 @@ function App() {
     quoteDate: '2025/08/12',
     validDate: '2025/09/12',
     annualRevenue: 150000, // 改為萬元
-    specialRequirements: '24小時四班二輪制生產環境'
+    specialRequirements: '24小時四班二輪制生產環境',
+    shiftPattern: '24hours' // 新增班別模式
+  })
+
+  const [shiftPatterns] = useState({
+    '8hours': {
+      name: '標準8小時單班制',
+      workingHours: 8,
+      riskMultiplier: 0.3, // 風險係數較低
+      description: '週一到週五，正常上班時間，適合辦公型業務'
+    },
+    '12hours': {
+      name: '12小時兩班制', 
+      workingHours: 12,
+      riskMultiplier: 0.6,
+      description: '白班夜班輪替，有一定連續性需求'
+    },
+    '24hours': {
+      name: '24小時四班二輪制',
+      workingHours: 24,
+      riskMultiplier: 1.0, // 風險係數最高
+      description: '連續生產，系統停機影響重大'
+    },
+    'custom': {
+      name: '自訂班別',
+      workingHours: 16,
+      riskMultiplier: 0.8,
+      description: '客製化生產時間'
+    }
   })
 
   const [serviceDetails, setServiceDetails] = useState({
@@ -146,14 +174,17 @@ function App() {
           setCompanyInfo={setCompanyInfo}
           serviceDetails={serviceDetails}
           setServiceDetails={setServiceDetails}
+          shiftPatterns={shiftPatterns}
         />
         <ComparisonTable 
           companyInfo={companyInfo}
           serviceDetails={serviceDetails}
+          shiftPatterns={shiftPatterns}
         />
         <ExportButtons 
           companyInfo={companyInfo}
           serviceDetails={serviceDetails}
+          shiftPatterns={shiftPatterns}
         />
       </div>
     </div>

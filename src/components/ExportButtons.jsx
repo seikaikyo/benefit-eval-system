@@ -3,7 +3,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
 
-const ExportButtons = ({ companyInfo, serviceDetails }) => {
+const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const exportToPDF = async () => {
     try {
       const element = document.getElementById('comparison-table-container')
@@ -60,7 +60,9 @@ const ExportButtons = ({ companyInfo, serviceDetails }) => {
         ['有效期限', companyInfo.validDate],
         ['年營業額 (萬元)', companyInfo.annualRevenue],
         ['年營業額 (新台幣)', `NT$ ${(companyInfo.annualRevenue * 10000).toLocaleString()}`],
-        ['特殊需求', companyInfo.specialRequirements]
+        ['特殊需求', companyInfo.specialRequirements],
+        ['生產班別', shiftPatterns[companyInfo.shiftPattern].name],
+        ['班別描述', shiftPatterns[companyInfo.shiftPattern].description]
       ]
       const companyWS = XLSX.utils.aoa_to_sheet(companyData)
       XLSX.utils.book_append_sheet(workbook, companyWS, '公司資訊')
