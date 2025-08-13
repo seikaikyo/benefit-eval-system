@@ -13,22 +13,36 @@ const TAX_ID_APIS = [
           // 尋找完全匹配的統編
           const company = data.output.find(c => c.Business_Accounting_NO === cleanTaxId) || data.output[0]
           if (company) {
+            // 格式化資本額（從分轉為元）
+            const capital = company.Capital_Stock_Amount ? 
+              Math.round(company.Capital_Stock_Amount / 10000) + '萬元' : ''
+            
+            // 格式化設立日期
+            const formatDate = (dateStr) => {
+              if (!dateStr || dateStr.length !== 7) return dateStr
+              const year = parseInt(dateStr.substring(0, 3)) + 1911
+              const month = dateStr.substring(3, 5)
+              const day = dateStr.substring(5, 7)
+              return `${year}/${month}/${day}`
+            }
+            
             return {
               success: true,
               data: {
                 companyName: company.Company_Name || '',
                 address: company.Company_Location || '',
                 representative: company.Responsible_Name || '',
-                capital: company.Capital_Stock_Amount || '',
-                status: company.Company_Status || '',
-                establishDate: company.Company_Setup_Date || '',
-                businessItem: company.Cmp_Business || ''
+                capital: capital,
+                status: company.Company_Status_Desc || company.Company_Status || '',
+                establishDate: formatDate(company.Company_Setup_Date) || '',
+                registerOrg: company.Register_Organization_Desc || ''
               }
             }
           }
         }
       } catch (e) {
         console.log('解析OpenData VIP數據失敗:', e)
+        console.error('錯誤詳情:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
@@ -144,12 +158,16 @@ export const queryCompanyInfo = async (taxId) => {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; TaxID-Lookup/1.0)'
+          'User-Agent': 'Mozilla/5.0 (compatible; TaxID-Lookup/1.0)',
+          'Content-Type': 'application/json'
         }
       }
 
-      // 添加CORS設定
-      if (api.corsMode) {
+      // 針對OpenData VIP API使用特殊設定
+      if (api.name.includes('OpenData VIP')) {
+        fetchOptions.mode = 'cors'
+        fetchOptions.credentials = 'omit'
+      } else if (api.corsMode) {
         fetchOptions.mode = api.corsMode
       }
       
