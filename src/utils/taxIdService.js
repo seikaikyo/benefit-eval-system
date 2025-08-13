@@ -174,11 +174,11 @@ export const queryCompanyInfo = async (taxId) => {
     }
   }
   
-  // 如果所有API都失敗，嘗試本地數據庫
-  console.log('所有API查詢失敗，嘗試本地數據庫')
-  const localResult = queryFromLocalDatabase(cleanTaxId)
-  if (localResult.success) {
-    return localResult
+  // 如果所有API都失敗，最後再嘗試本地數據庫
+  console.log('所有API查詢失敗，最終嘗試本地數據庫')
+  const finalLocalResult = queryFromLocalDatabase(cleanTaxId)
+  if (finalLocalResult.success) {
+    return finalLocalResult
   }
 
   // 所有查詢都失敗，提供詳細的錯誤資訊
