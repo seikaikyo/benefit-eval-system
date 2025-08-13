@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 const UserGuide = () => {
-  const [isCollapsed, setIsCollapsed] = useState(true) // 預設為摺疊狀態
+  const [isCollapsed, setIsCollapsed] = useState(false) // 預設為展開狀態
   
   // 導航錨點配置
   const navigationItems = [
@@ -38,7 +38,7 @@ const UserGuide = () => {
         {
           step: '1. 統編查詢',
           description: '在公司資訊區塊的統編查詢框中輸入8位數統編號碼',
-          tips: ['可輸入研華(22356500)、示範(12345678)、智能(87654321)等測試統編', '系統會自動驗證格式並查詢公司資訊'],
+          tips: ['輸入8位數統編號碼進行查詢', '系統會自動驗證格式並查詢公司資訊'],
           image: '🔍'
         },
         {
@@ -96,7 +96,7 @@ const UserGuide = () => {
         {
           step: '統編查詢失敗',
           description: '如果統編查詢顯示失敗，可能的原因和解決方案',
-          tips: ['檢查統編是否為8位數字', '嘗試重新查詢或手動輸入', '使用測試統編：22356500, 12345678, 87654321'],
+          tips: ['檢查統編是否為8位數字', '嘗試重新查詢或手動輸入', '如查無資料請直接手動填寫公司資訊'],
           image: '❌'
         },
         {
@@ -125,7 +125,7 @@ const UserGuide = () => {
         {
           step: '快速配置',
           description: '使用預設統編快速開始',
-          tips: ['22356500 - 研華股份有限公司（真實數據）', '12345678 - 示範科技（測試數據）', '87654321 - 智能製造（測試數據）'],
+          tips: ['支援台灣公司統編查詢', '自動填入公司基本資訊', '查無資料時請手動輸入'],
           image: '⚡'
         },
         {
@@ -281,7 +281,6 @@ const UserGuide = () => {
             lineHeight: '1.4'
           }}>
             • 點擊上方項目可快速跳轉到對應區域<br />
-            • 統編查詢支援：22099131、22466564等<br />
             • 調整服務配置後會即時更新成本分析
           </div>
         </div>
