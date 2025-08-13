@@ -84,7 +84,7 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
     <div className="config-panel">
       <h2>🔧 報價單配置面板</h2>
       
-      <div className="config-section">
+      <div id="company-info" className="config-section">
         <h3>📋 公司資訊</h3>
         
         {/* 統編查詢功能 */}
@@ -197,7 +197,7 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
           </div>
         </div>
         <div className="shift-requirements-grid">
-          <div className="shift-patterns-section">
+          <div id="shift-pattern" className="shift-patterns-section">
             <h4>🏭 生產班別模式</h4>
             <div className="radio-group">
               {Object.entries(shiftPatterns).map(([key, pattern]) => (
@@ -218,7 +218,7 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
             </div>
           </div>
           
-          <div className="requirements-section">
+          <div id="special-requirements" className="requirements-section">
             <h4>📝 特殊需求</h4>
             <textarea 
               value={companyInfo.specialRequirements}
@@ -233,7 +233,7 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
       <div className="config-section">
         <h3>📝 服務項目內容編輯</h3>
         
-        <div className="service-category">
+        <div id="service-config" className="service-category">
           <h4>平台與應用層服務</h4>
           {Object.entries(serviceDetails.platform).map(([type, config]) => (
             <div key={type} className="service-config">

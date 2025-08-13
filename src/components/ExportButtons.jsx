@@ -361,7 +361,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
 
   return (
     <>
-      <div className="export-buttons">
+      <div id="export-section" className="export-buttons">
         <h3>📤 匯出報價書</h3>
         <div className="button-group">
           <button 

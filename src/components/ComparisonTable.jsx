@@ -276,7 +276,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </table>
       </div>
 
-      <div className="summary-box">
+      <div id="cost-analysis" className="summary-box">
         <h3>💰 停機風險成本分析</h3>
         
         {/* 班別資訊和基礎營收數據 */}

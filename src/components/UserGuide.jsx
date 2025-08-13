@@ -1,8 +1,35 @@
 import React, { useState } from 'react'
 
 const UserGuide = () => {
-  const [activeSection, setActiveSection] = useState('basic')
   const [isCollapsed, setIsCollapsed] = useState(true) // 預設為摺疊狀態
+  
+  // 導航錨點配置
+  const navigationItems = [
+    { id: 'company-info', label: '🏢 公司資訊', description: '統編查詢與基本資料' },
+    { id: 'shift-pattern', label: '🏭 生產班別', description: '選擇生產模式' },
+    { id: 'special-requirements', label: '📝 特殊需求', description: '填寫客製化需求' },
+    { id: 'service-config', label: '⚙️ 服務配置', description: '調整服務方案與價格' },
+    { id: 'comparison-table-container', label: '📊 方案比較', description: '查看詳細對照表' },
+    { id: 'cost-analysis', label: '💰 成本分析', description: '檢視停機風險評估' },
+    { id: 'export-section', label: '📄 匯出報價', description: '生成PDF或Excel報價書' }
+  ]
+  
+  // 平滑滾動到指定區域
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      })
+      // 高亮顯示目標元素
+      element.style.boxShadow = '0 0 20px rgba(25, 118, 210, 0.3)'
+      setTimeout(() => {
+        element.style.boxShadow = ''
+      }, 2000)
+    }
+  }
 
   const sections = {
     basic: {
@@ -121,7 +148,7 @@ const UserGuide = () => {
     <div style={{
       background: 'white',
       borderRadius: '10px',
-      padding: isCollapsed ? '15px' : '25px',
+      padding: '20px',
       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
       transition: 'all 0.3s ease',
       height: 'fit-content'
@@ -135,11 +162,11 @@ const UserGuide = () => {
         <h2 style={{
           margin: '0',
           color: '#333',
-          fontSize: isCollapsed ? '16px' : '20px',
+          fontSize: isCollapsed ? '16px' : '18px',
           fontWeight: 'bold',
           transition: 'all 0.3s ease'
         }}>
-          {isCollapsed ? '📚 使用指南' : '📚 WISE-IoT SRP 維運服務評估系統使用指南'}
+          {isCollapsed ? '🧭 快速導航' : '🧭 報價單快速導航'}
         </h2>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -155,164 +182,108 @@ const UserGuide = () => {
           }}
           onMouseEnter={(e) => e.target.style.background = '#f0f0f0'}
           onMouseLeave={(e) => e.target.style.background = 'transparent'}
-          title={isCollapsed ? '展開使用指南' : '收起使用指南'}
+          title={isCollapsed ? '展開導航面板' : '收起導航面板'}
         >
           {isCollapsed ? '▶️' : '◀️'}
         </button>
       </div>
 
-      {/* 導航選項卡 */}
+      {/* 導航錨點列表 */}
       {!isCollapsed && (
         <div style={{
           display: 'flex',
-          gap: '8px',
-          marginBottom: '20px',
-          borderBottom: '2px solid #f0f0f0',
-          paddingBottom: '10px',
-          flexWrap: 'wrap'
+          flexDirection: 'column',
+          gap: '8px'
         }}>
-        {Object.entries(sections).map(([key, section]) => (
-          <button
-            key={key}
-            onClick={() => setActiveSection(key)}
-            style={{
-              padding: '6px 12px',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '12px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              background: activeSection === key ? '#1976d2' : '#f5f5f5',
-              color: activeSection === key ? 'white' : '#666'
-            }}
-          >
-            {section.title}
-          </button>
-        ))}
-        </div>
-      )}
-
-      {/* 內容區域 */}
-      {!isCollapsed && (
-        <div style={{
-          padding: '15px',
-          background: '#fafafa',
-          borderRadius: '8px',
-          border: '1px solid #e0e0e0'
-        }}>
-        <h3 style={{
-          margin: '0 0 20px 0',
-          color: '#1976d2',
-          fontSize: '18px'
-        }}>
-          {sections[activeSection].title}
-        </h3>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {sections[activeSection].content.map((item, index) => (
-            <div key={index} style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              border: '1px solid #e0e0e0',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-            }}>
-              <div style={{
+          {navigationItems.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              style={{
                 display: 'flex',
-                alignItems: 'flex-start',
-                gap: '15px'
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: '12px',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                background: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                textAlign: 'left',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = '#f8fcff'
+                e.target.style.borderColor = '#1976d2'
+                e.target.style.transform = 'translateX(5px)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'white'
+                e.target.style.borderColor = '#e0e0e0'
+                e.target.style.transform = 'translateX(0)'
+              }}
+            >
+              <span style={{
+                fontSize: '16px',
+                minWidth: '20px',
+                textAlign: 'center'
               }}>
+                {item.label.split(' ')[0]}
+              </span>
+              <div style={{ flex: 1 }}>
                 <div style={{
-                  fontSize: '24px',
-                  lineHeight: '1',
-                  minWidth: '30px'
+                  fontWeight: '600',
+                  color: '#333',
+                  marginBottom: '2px'
                 }}>
-                  {item.image}
+                  {item.label.substring(2)}
                 </div>
-                
-                <div style={{ flex: 1 }}>
-                  <h4 style={{
-                    margin: '0 0 10px 0',
-                    color: '#333',
-                    fontSize: '16px',
-                    fontWeight: '600'
-                  }}>
-                    {item.step}
-                  </h4>
-                  
-                  <p style={{
-                    margin: '0 0 15px 0',
-                    color: '#666',
-                    fontSize: '14px',
-                    lineHeight: '1.5'
-                  }}>
-                    {item.description}
-                  </p>
-                  
-                  <div style={{
-                    background: '#f8f9fa',
-                    padding: '12px',
-                    borderRadius: '6px',
-                    border: '1px solid #e9ecef'
-                  }}>
-                    <div style={{
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#495057',
-                      marginBottom: '8px'
-                    }}>
-                      💡 小提示：
-                    </div>
-                    {item.tips.map((tip, tipIndex) => (
-                      <div key={tipIndex} style={{
-                        fontSize: '12px',
-                        color: '#6c757d',
-                        marginBottom: '4px',
-                        paddingLeft: '12px',
-                        position: 'relative'
-                      }}>
-                        <span style={{
-                          position: 'absolute',
-                          left: '0',
-                          color: '#28a745'
-                        }}>•</span>
-                        {tip}
-                      </div>
-                    ))}
-                  </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#666'
+                }}>
+                  {item.description}
                 </div>
               </div>
-            </div>
+              <span style={{
+                fontSize: '12px',
+                color: '#1976d2',
+                opacity: 0.7
+              }}>
+                ›
+              </span>
+            </button>
           ))}
         </div>
-      </div>
       )}
 
-      {/* 快速聯絡資訊 */}
+      {/* 快速提示 */}
       {!isCollapsed && (
-      <div style={{
-        marginTop: '25px',
-        padding: '15px',
-        background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)',
-        borderRadius: '8px',
-        textAlign: 'center'
-      }}>
-        <h4 style={{
-          margin: '0 0 10px 0',
-          color: '#1976d2',
-          fontSize: '16px'
+        <div style={{
+          marginTop: '20px',
+          padding: '15px',
+          background: 'linear-gradient(135deg, #e8f5e8, #c8e6c9)',
+          borderRadius: '8px',
+          border: '1px solid #4caf50'
         }}>
-          📞 需要協助？
-        </h4>
-        <p style={{
-          margin: '0',
-          fontSize: '14px',
-          color: '#1565c0'
-        }}>
-          如有任何使用問題，歡迎聯繫研華科技客服團隊<br />
-          或參考系統右上角的操作提示
-        </p>
+          <h4 style={{
+            margin: '0 0 10px 0',
+            color: '#2e7d32',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            💡 快速操作提示
+          </h4>
+          <div style={{
+            fontSize: '12px',
+            color: '#388e3c',
+            lineHeight: '1.4'
+          }}>
+            • 點擊上方項目可快速跳轉到對應區域<br />
+            • 統編查詢支援：22099131、22466564等<br />
+            • 調整服務配置後會即時更新成本分析
+          </div>
         </div>
       )}
     </div>

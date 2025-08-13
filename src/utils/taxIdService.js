@@ -1,65 +1,42 @@
 // 台灣統編查詢服務
 
-// 多個可用的統編查詢API服務
-const TAX_ID_APIS = [
-  {
-    name: 'G0V 公司資料API',
-    url: 'https://company.g0v.ronny.tw/api/search',
-    corsMode: 'cors',
-    parse: (data, cleanTaxId) => {
-      try {
-        console.log('G0V API原始回應:', data)
-        if (data && data.data && data.data.length > 0) {
-          // 尋找完全匹配的統編
-          const company = data.data.find(c => c['統一編號'] === cleanTaxId) || data.data[0]
-          return {
-            success: true,
-            data: {
-              companyName: company['公司名稱'] || company.name || '',
-              address: company['公司地址'] || company.address || '',
-              representative: company['代表人姓名'] || company.representative || '',
-              capital: company['資本額'] || '',
-              status: company['公司狀況'] || company.status || '',
-              establishDate: company['設立日期'] || ''
-            }
-          }
+// 使用Vercel API代理解決CORS問題
+const queryWithVercelProxy = async (cleanTaxId) => {
+  try {
+    // 檢查是否在生產環境或開發環境
+    const baseUrl = window.location.origin
+    const apiUrl = `${baseUrl}/api/taxid?taxid=${cleanTaxId}`
+    
+    console.log(`使用Vercel API代理查詢統編: ${cleanTaxId}`)
+    console.log(`API URL: ${apiUrl}`)
+    
+    const response = await fetch(apiUrl)
+    const result = await response.json()
+    
+    console.log('Vercel API代理回應:', result)
+    
+    if (result.success) {
+      return {
+        success: true,
+        data: {
+          ...result.data,
+          taxId: cleanTaxId
         }
-      } catch (e) {
-        console.log('解析G0V數據失敗:', e)
       }
-      return { success: false, error: '查無此統編資料' }
+    } else {
+      return {
+        success: false,
+        error: result.error || '查無此統編資料'
+      }
     }
-  },
-  {
-    name: '台灣政府公開資料API',
-    url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
-    corsMode: 'cors',
-    parse: (data, cleanTaxId) => {
-      try {
-        console.log('政府API原始回應:', data)
-        if (data && Array.isArray(data) && data.length > 0) {
-          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId)
-          if (company) {
-            return {
-              success: true,
-              data: {
-                companyName: company.Company_Name || '',
-                address: company.Company_Location || '',
-                representative: company.Responsible_Name || '',
-                capital: company.Capital_Stock_Amount || '',
-                status: company.Company_Status || '',
-                establishDate: company.Company_Setup_Date || ''
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.log('解析政府API數據失敗:', e)
-      }
-      return { success: false, error: '查無此統編資料' }
+  } catch (error) {
+    console.error('Vercel API代理查詢失敗:', error)
+    return {
+      success: false,
+      error: 'API服務暫時無法使用'
     }
   }
-]
+}
 
 // 驗證統編格式
 export const validateTaxId = (taxId) => {
@@ -93,85 +70,19 @@ export const queryCompanyInfo = async (taxId) => {
   
   console.log(`開始查詢統編: ${cleanTaxId}`)
   
-  // 優先嘗試本地數據庫（因為外部API有CORS限制）
+  // 優先使用Vercel API代理（解決CORS問題）
+  const proxyResult = await queryWithVercelProxy(cleanTaxId)
+  if (proxyResult.success) {
+    console.log('Vercel API代理查詢成功:', proxyResult)
+    return proxyResult
+  }
+  
+  // 如果API代理失敗，回退到本地數據庫
+  console.log('API代理失敗，嘗試本地數據庫')
   const localResult = queryFromLocalDatabase(cleanTaxId)
   if (localResult.success) {
     console.log('本地數據庫查詢成功:', localResult)
     return localResult
-  }
-  
-  // 嘗試所有外部API（但可能受CORS限制）
-  for (const api of TAX_ID_APIS) {
-    try {
-      let url
-      if (api.name.includes('OpenData VIP')) {
-        url = `${api.url}?keyword=${cleanTaxId}`
-      } else if (api.name.includes('G0V')) {
-        url = `${api.url}?q=${cleanTaxId}`
-      } else {
-        // 台灣政府API
-        url = `${api.url}?$filter=Business_Accounting_NO eq '${cleanTaxId}'&$format=json`
-      }
-      
-      console.log(`嘗試使用 ${api.name} 查詢統編: ${cleanTaxId}`)
-      
-      const fetchOptions = {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; TaxID-Lookup/1.0)',
-          'Content-Type': 'application/json'
-        }
-      }
-
-      // 針對OpenData VIP API使用特殊設定
-      if (api.name.includes('OpenData VIP')) {
-        fetchOptions.mode = 'cors'
-        fetchOptions.credentials = 'omit'
-        // 移除可能導致CORS問題的headers
-        delete fetchOptions.headers['Content-Type']
-        delete fetchOptions.headers['User-Agent']
-      } else if (api.corsMode) {
-        fetchOptions.mode = api.corsMode
-      }
-      
-      console.log(`正在請求: ${url}`)
-      console.log(`請求選項:`, fetchOptions)
-      
-      const response = await fetch(url, fetchOptions)
-      
-      console.log(`${api.name} HTTP 狀態:`, response.status, response.statusText)
-      console.log(`${api.name} Headers:`, Object.fromEntries(response.headers.entries()))
-      
-      if (!response.ok) {
-        console.log(`${api.name} API 回應錯誤:`, response.status, response.statusText)
-        const errorText = await response.text()
-        console.log(`錯誤內容:`, errorText)
-        continue
-      }
-      
-      const data = await response.json()
-      console.log(`${api.name} 回應數據:`, data)
-      
-      const result = api.parse(data, cleanTaxId)
-      if (result.success) {
-        return {
-          success: true,
-          data: {
-            ...result.data,
-            taxId: cleanTaxId,
-            apiSource: api.name
-          }
-        }
-      }
-    } catch (error) {
-      console.log(`${api.name} 查詢失敗:`, error.message)
-      // 如果是CORS錯誤，給出提示
-      if (error.message.includes('CORS') || error.message.includes('Cross-Origin') || error.message.includes('fetch')) {
-        console.log(`${api.name} CORS或網路問題，嘗試下一個API...`)
-      }
-      continue
-    }
   }
   
   // 如果所有API都失敗，最後再嘗試本地數據庫
