@@ -531,6 +531,7 @@ body {
 /* Textarea Styles */
 .requirements-section textarea {
   width: 100%;
+  box-sizing: border-box;
   padding: 12px 15px;
   border: 2px solid #e9ecef;
   border-radius: 8px;
@@ -623,6 +624,16 @@ body {
   font-style: italic;
   margin-top: 5px;
   font-size: 11px;
+}
+
+.not-included {
+  color: #dc3545;
+  font-style: italic;
+  text-align: center;
+  padding: 10px;
+  background: #f8d7da;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 /* Responsive Design */

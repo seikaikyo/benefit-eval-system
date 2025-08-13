@@ -368,28 +368,46 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
               <tr>
                 <td className="category-header">平台層項目</td>
                 <td className="features-cell">
-                  {serviceDetails.platform.basic.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.platform.basic.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.platform.basic.features.length} 項</div>
-                  }
+                  {serviceDetails.platform.basic.enabled ? (
+                    <>
+                      {serviceDetails.platform.basic.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.platform.basic.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.platform.basic.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
                 <td className="features-cell">
-                  {serviceDetails.platform.advanced.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.platform.advanced.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.platform.advanced.features.length} 項</div>
-                  }
+                  {serviceDetails.platform.advanced.enabled ? (
+                    <>
+                      {serviceDetails.platform.advanced.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.platform.advanced.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.platform.advanced.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
                 <td className="features-cell">
-                  {serviceDetails.platform.premium.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.platform.premium.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.platform.premium.features.length} 項</div>
-                  }
+                  {serviceDetails.platform.premium.enabled ? (
+                    <>
+                      {serviceDetails.platform.premium.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.platform.premium.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.platform.premium.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
               </tr>
               <tr>
@@ -401,35 +419,62 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
               <tr>
                 <td className="category-header">硬體層項目</td>
                 <td className="features-cell">
-                  {serviceDetails.hardware.basic.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.hardware.basic.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.hardware.basic.features.length} 項</div>
-                  }
+                  {serviceDetails.hardware.basic.enabled ? (
+                    <>
+                      {serviceDetails.hardware.basic.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.hardware.basic.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.hardware.basic.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
                 <td className="features-cell">
-                  {serviceDetails.hardware.advanced.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.hardware.advanced.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.hardware.advanced.features.length} 項</div>
-                  }
+                  {serviceDetails.hardware.advanced.enabled ? (
+                    <>
+                      {serviceDetails.hardware.advanced.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.hardware.advanced.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.hardware.advanced.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
                 <td className="features-cell">
-                  {serviceDetails.hardware.premium.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="feature-preview">• {feature}</div>
-                  ))}
-                  {serviceDetails.hardware.premium.features.length > 3 && 
-                    <div className="feature-more">...等 {serviceDetails.hardware.premium.features.length} 項</div>
-                  }
+                  {serviceDetails.hardware.premium.enabled ? (
+                    <>
+                      {serviceDetails.hardware.premium.features.slice(0, 2).map((feature, index) => (
+                        <div key={index} className="feature-preview">• {feature}</div>
+                      ))}
+                      {serviceDetails.hardware.premium.features.length > 2 && 
+                        <div className="feature-more">...等 {serviceDetails.hardware.premium.features.length} 項</div>
+                      }
+                    </>
+                  ) : (
+                    <div className="not-included">未包含此服務</div>
+                  )}
                 </td>
               </tr>
               <tr>
                 <td className="category-header">組合總價</td>
-                <td className="total-price-cell">NT$ {(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}</td>
-                <td className="total-price-cell">NT$ {(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}</td>
-                <td className="total-price-cell">NT$ {(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}</td>
+                <td className="total-price-cell">
+                  NT$ {((serviceDetails.platform.basic.enabled ? serviceDetails.platform.basic.price : 0) + 
+                        (serviceDetails.hardware.basic.enabled ? serviceDetails.hardware.basic.price : 0)).toLocaleString()}
+                </td>
+                <td className="total-price-cell">
+                  NT$ {((serviceDetails.platform.advanced.enabled ? serviceDetails.platform.advanced.price : 0) + 
+                        (serviceDetails.hardware.advanced.enabled ? serviceDetails.hardware.advanced.price : 0)).toLocaleString()}
+                </td>
+                <td className="total-price-cell">
+                  NT$ {((serviceDetails.platform.premium.enabled ? serviceDetails.platform.premium.price : 0) + 
+                        (serviceDetails.hardware.premium.enabled ? serviceDetails.hardware.premium.price : 0)).toLocaleString()}
+                </td>
               </tr>
             </tbody>
           </table>
