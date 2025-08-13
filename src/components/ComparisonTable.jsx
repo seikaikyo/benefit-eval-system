@@ -21,6 +21,63 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     return platformPrice + hardwarePrice
   }
 
+  // 動態生成服務功能對照表
+  const generateFeatureRows = () => {
+    const rows = []
+    
+    // 平台服務項目
+    const maxPlatformFeatures = Math.max(
+      serviceDetails.platform.basic.features.length,
+      serviceDetails.platform.advanced.features.length,
+      serviceDetails.platform.premium.features.length
+    )
+
+    for (let i = 0; i < maxPlatformFeatures; i++) {
+      const basicFeature = serviceDetails.platform.basic.features[i] || ''
+      const advancedFeature = serviceDetails.platform.advanced.features[i] || ''
+      const premiumFeature = serviceDetails.platform.premium.features[i] || ''
+      
+      const featureName = basicFeature || advancedFeature || premiumFeature
+      
+      if (featureName) {
+        rows.push({
+          type: 'platform',
+          name: featureName,
+          basic: basicFeature ? '✓' : '✗',
+          advanced: advancedFeature ? '✓' : '✗',
+          premium: premiumFeature ? '✓' : '✗'
+        })
+      }
+    }
+
+    // 硬體服務項目
+    const maxHardwareFeatures = Math.max(
+      serviceDetails.hardware.basic.features.length,
+      serviceDetails.hardware.advanced.features.length,
+      serviceDetails.hardware.premium.features.length
+    )
+
+    for (let i = 0; i < maxHardwareFeatures; i++) {
+      const basicFeature = serviceDetails.hardware.basic.features[i] || ''
+      const advancedFeature = serviceDetails.hardware.advanced.features[i] || ''
+      const premiumFeature = serviceDetails.hardware.premium.features[i] || ''
+      
+      const featureName = basicFeature || advancedFeature || premiumFeature
+      
+      if (featureName) {
+        rows.push({
+          type: 'hardware',
+          name: featureName,
+          basic: basicFeature ? '✓' : '✗',
+          advanced: advancedFeature ? '✓' : '✗',
+          premium: premiumFeature ? '✓' : '✗'
+        })
+      }
+    }
+
+    return rows
+  }
+
   // 智能分析服務適用性
   const analyzeServiceSuitability = (category, type) => {
     const service = serviceDetails[category][type]
@@ -152,145 +209,46 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </tr>
           </thead>
           <tbody>
-            {/* 平台與應用層分組 */}
-            <tr style={{background: '#e3f2fd'}}>
-              <td colSpan="4" style={{fontWeight: 'bold', color: '#1976d2', padding: '10px'}}>
-                平台與應用層
-              </td>
-            </tr>
-            <tr>
-              <td>遠端異常排除 (登入/存取/UI/負載)</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>軟體功能維持與錯誤修正</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>協助平台應用軟體升級</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-            </tr>
-            <tr>
-              <td>協助網路憑證更新</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-            </tr>
-            <tr>
-              <td>協助執行資料庫備份</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(2次)</td>
-              <td style={{textAlign: 'center'}}>✓(2次)</td>
-            </tr>
-            <tr>
-              <td>遠端歲修開關機作業</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-            </tr>
-            <tr>
-              <td>平台健康狀態巡檢</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(4次)</td>
-              <td style={{textAlign: 'center'}}>✓(4次)</td>
-            </tr>
-            <tr>
-              <td>重大風險主動通知</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>平台層線上基本維運培訓</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>4小時</td>
-              <td style={{textAlign: 'center'}}>4小時</td>
-            </tr>
-            <tr>
-              <td>應用層線上基本維運培訓</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>8小時</td>
-              <td style={{textAlign: 'center'}}>8小時</td>
-            </tr>
-            <tr>
-              <td>原廠專家開發技術諮詢</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            
-            {/* 硬體基礎層分組 */}
-            <tr style={{background: '#f3e5f5'}}>
-              <td colSpan="4" style={{fontWeight: 'bold', color: '#9c27b0', padding: '10px'}}>
-                硬體基礎層
-              </td>
-            </tr>
-            <tr>
-              <td>技術支援 (工單/郵件/免付費電話)</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>專屬Line報修管道</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>專線電話</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>軟體、韌體更新服務</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>硬體層監控軟體與告警配置</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-              <td style={{textAlign: 'center'}}>✓(1次)</td>
-            </tr>
-            <tr>
-              <td>到場服務（隔日到府維修）</td>
-              <td style={{textAlign: 'center'}}>2次</td>
-              <td style={{textAlign: 'center'}}>2次</td>
-              <td style={{textAlign: 'center'}}>2次</td>
-            </tr>
-            <tr>
-              <td>基礎層設備巡檢</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>5*8/2次</td>
-              <td style={{textAlign: 'center'}}>5*8/2次</td>
-            </tr>
-            <tr>
-              <td>到場服務時段</td>
-              <td style={{textAlign: 'center'}}>5*8</td>
-              <td style={{textAlign: 'center'}}>5*8</td>
-              <td style={{textAlign: 'center'}}>7*8</td>
-            </tr>
-            <tr>
-              <td>全時段技術支援 (7*24)</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>✓</td>
-            </tr>
-            <tr>
-              <td>基礎層線上基本運維培訓</td>
-              <td style={{textAlign: 'center'}}>✗</td>
-              <td style={{textAlign: 'center'}}>2小時</td>
-              <td style={{textAlign: 'center'}}>2小時</td>
-            </tr>
+            {/* 動態生成服務功能對照表 */}
+            {(() => {
+              const featureRows = generateFeatureRows()
+              const platformRows = featureRows.filter(row => row.type === 'platform')
+              const hardwareRows = featureRows.filter(row => row.type === 'hardware')
+              
+              return (
+                <>
+                  {/* 平台與應用層分組 */}
+                  <tr style={{background: '#e3f2fd'}}>
+                    <td colSpan="4" style={{fontWeight: 'bold', color: '#1976d2', padding: '10px'}}>
+                      平台與應用層
+                    </td>
+                  </tr>
+                  {platformRows.map((row, index) => (
+                    <tr key={`platform-${index}`}>
+                      <td>{row.name}</td>
+                      <td style={{textAlign: 'center'}}>{row.basic}</td>
+                      <td style={{textAlign: 'center'}}>{row.advanced}</td>
+                      <td style={{textAlign: 'center'}}>{row.premium}</td>
+                    </tr>
+                  ))}
+                  
+                  {/* 硬體基礎層分組 */}
+                  <tr style={{background: '#f3e5f5'}}>
+                    <td colSpan="4" style={{fontWeight: 'bold', color: '#9c27b0', padding: '10px'}}>
+                      硬體基礎層
+                    </td>
+                  </tr>
+                  {hardwareRows.map((row, index) => (
+                    <tr key={`hardware-${index}`}>
+                      <td>{row.name}</td>
+                      <td style={{textAlign: 'center'}}>{row.basic}</td>
+                      <td style={{textAlign: 'center'}}>{row.advanced}</td>
+                      <td style={{textAlign: 'center'}}>{row.premium}</td>
+                    </tr>
+                  ))}
+                </>
+              )
+            })()}
 
             {/* 年度價格 */}
             <tr style={{background: '#f0f0f0'}}>
@@ -347,7 +305,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </div>
           </div>
           <div style={{textAlign: 'center', marginTop: '20px', padding: '12px', border: '2px dashed #ff9800', borderRadius: '8px', background: 'white'}}>
-            <span style={{color: '#ef6c00', fontWeight: '600'}}>⚠️ 夜班故障警示無人處理，可能延誤4小時以上造成損失</span>
+            <span style={{color: '#ef6c00', fontWeight: '600'}}>⚠️ {shiftPatterns[companyInfo.shiftPattern].workingHours >= 16 ? '夜班故障警示無人處理，可能延誤' + Math.round(24 - shiftPatterns[companyInfo.shiftPattern].workingHours + 2) + '小時以上造成損失' : '非工作時間故障風險，可能延誤' + Math.round(16 - shiftPatterns[companyInfo.shiftPattern].workingHours) + '小時處理'}</span>
           </div>
         </div>
 
@@ -390,7 +348,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#f44336', fontWeight: '600'}}>Basic MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('basic', 'basic'))}</p>
             <p style={{color: '#f44336', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>❌ 高風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次2小時停機損失({calculateHourlyRevenue() * 2}萬)就超過與Premium的差額，對15億營業而言風險太高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPrice('premium', 'premium') - getCombinedPrice('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({((getCombinedPrice('premium', 'premium') - getCombinedPrice('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
           </div>
 
           {/* Advanced方案 */}
@@ -404,7 +362,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#ff9800', fontWeight: '600'}}>Advanced MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('advanced', 'advanced'))}</p>
             <p style={{color: '#ff9800', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>⚠️ 中等風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次4小時停機損失可能超過年整體節省效益。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPrice('premium', 'premium') - getCombinedPrice('advanced', 'advanced')) / (calculateHourlyRevenue() * 10000) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
           </div>
 
           {/* Premium方案 */}
@@ -418,7 +376,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#4caf50', fontWeight: '600'}}>Premium MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('premium', 'premium'))}</p>
             <p style={{color: '#4caf50', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>✅ 最佳投資</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>7*24支援，最適合連續性要求。成本僅佔年營業額0.067%，ROI極高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>7*24支援，最適合連續性要求。成本僅佔年營業額{(((getCombinedPrice('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%，ROI極高。</p>
           </div>
         </div>
 
@@ -448,7 +406,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           </div>
         </div>
 
-        {/* 成本對比總結 */}
+        {/* 成本對比總結 - 智能計算 */}
         <div style={{
           border: '2px solid #9c27b0',
           borderRadius: '10px',
@@ -466,9 +424,12 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             fontSize: '18px',
             fontWeight: '600'
           }}>
-            <span style={{color: '#4caf50'}}>{getCombinedPrice('premium', 'premium').toLocaleString()}萬建置成本</span>
+            <span style={{color: '#4caf50'}}>{(getCombinedPrice('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
             <span style={{margin: '0 20px', color: '#666', fontSize: '24px'}}>&lt;</span>
-            <span style={{color: '#f44336'}}>{Math.round((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)) * 24)}小時停機損失({Math.round(getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000) * 24 * calculateHourlyRevenue())}萬)</span>
+            <span style={{color: '#f44336'}}>{((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)) ).toFixed(1)}小時停機損失({(getCombinedPrice('premium', 'premium') / 10000).toFixed(1)}萬)</span>
+          </div>
+          <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
+            避免{((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000))).toFixed(1)}小時停機即可回本
           </div>
         </div>
 

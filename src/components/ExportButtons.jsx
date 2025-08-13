@@ -176,40 +176,71 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       const companyWS = XLSX.utils.aoa_to_sheet(companyData)
       XLSX.utils.book_append_sheet(workbook, companyWS, '客戶資訊')
 
-      // 第二個工作表：標準服務功能對照表 (與系統預覽完全一致)
+      // 第二個工作表：標準服務功能對照表 (動態生成，與系統預覽完全一致)
       const serviceComparisonData = [
         ['維運功能項目', 'Basic', 'Advanced', 'Premium'],
         [''],
-        ['平台與應用層', '', '', ''],
-        ['遠端異常排除 (登入/存取/UI/負載)', '✓', '✓', '✓'],
-        ['軟體功能維持與錯誤修正', '✓', '✓', '✓'],
-        ['協助平台應用軟體升級', '✗', '✓(1次)', '✓(1次)'],
-        ['協助網路憑證更新', '✗', '✓(1次)', '✓(1次)'],
-        ['協助執行資料庫備份', '✗', '✓(2次)', '✓(2次)'],
-        ['遠端歲修開關機作業', '✗', '✓(1次)', '✓(1次)'],
-        ['平台健康狀態巡檢', '✗', '✓(4次)', '✓(4次)'],
-        ['重大風險主動通知', '✗', '✓', '✓'],
-        ['平台層線上基本維運培訓', '✗', '4小時', '4小時'],
-        ['應用層線上基本維運培訓', '✗', '8小時', '8小時'],
-        ['原廠專家開發技術諮詢', '✗', '✗', '✓'],
-        [''],
-        ['硬體基礎層', '', '', ''],
-        ['技術支援 (工單/郵件/免付費電話)', '✓', '✓', '✓'],
-        ['專屬Line報修管道', '✗', '✓', '✓'],
-        ['專線電話', '✗', '✗', '✓'],
-        ['軟體、韌體更新服務', '✓', '✓', '✓'],
-        ['硬體層監控軟體與告警配置', '✗', '✓(1次)', '✓(1次)'],
-        ['到場服務（隔日到府維修）', '2次', '2次', '2次'],
-        ['基礎層設備巡檢', '✗', '5*8/2次', '5*8/2次'],
-        ['到場服務時段', '5*8', '5*8', '7*8'],
-        ['全時段技術支援 (7*24)', '✗', '✗', '✓'],
-        ['基礎層線上基本運維培訓', '✗', '2小時', '2小時'],
-        [''],
-        ['年度價格 (新台幣)', '', '', ''],
-        ['平台與應用層', `NT$ ${serviceDetails.platform.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.premium.price.toLocaleString()}`],
-        ['硬體基礎層', `NT$ ${serviceDetails.hardware.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.premium.price.toLocaleString()}`],
-        ['組合總價', `NT$ ${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}`]
+        ['平台與應用層', '', '', '']
       ]
+
+      // 動態生成平台服務項目
+      const maxPlatformFeatures = Math.max(
+        serviceDetails.platform.basic.features.length,
+        serviceDetails.platform.advanced.features.length,
+        serviceDetails.platform.premium.features.length
+      )
+
+      for (let i = 0; i < maxPlatformFeatures; i++) {
+        const basicFeature = serviceDetails.platform.basic.features[i] || ''
+        const advancedFeature = serviceDetails.platform.advanced.features[i] || ''
+        const premiumFeature = serviceDetails.platform.premium.features[i] || ''
+        
+        // 使用第一個有內容的feature作為項目名稱
+        const featureName = basicFeature || advancedFeature || premiumFeature
+        
+        if (featureName) {
+          serviceComparisonData.push([
+            featureName,
+            basicFeature ? '✓' : '✗',
+            advancedFeature ? '✓' : '✗',
+            premiumFeature ? '✓' : '✗'
+          ])
+        }
+      }
+
+      serviceComparisonData.push([''])
+      serviceComparisonData.push(['硬體基礎層', '', '', ''])
+
+      // 動態生成硬體服務項目
+      const maxHardwareFeatures = Math.max(
+        serviceDetails.hardware.basic.features.length,
+        serviceDetails.hardware.advanced.features.length,
+        serviceDetails.hardware.premium.features.length
+      )
+
+      for (let i = 0; i < maxHardwareFeatures; i++) {
+        const basicFeature = serviceDetails.hardware.basic.features[i] || ''
+        const advancedFeature = serviceDetails.hardware.advanced.features[i] || ''
+        const premiumFeature = serviceDetails.hardware.premium.features[i] || ''
+        
+        // 使用第一個有內容的feature作為項目名稱
+        const featureName = basicFeature || advancedFeature || premiumFeature
+        
+        if (featureName) {
+          serviceComparisonData.push([
+            featureName,
+            basicFeature ? '✓' : '✗',
+            advancedFeature ? '✓' : '✗',
+            premiumFeature ? '✓' : '✗'
+          ])
+        }
+      }
+
+      serviceComparisonData.push([''])
+      serviceComparisonData.push(['年度價格 (新台幣)', '', '', ''])
+      serviceComparisonData.push(['平台與應用層', `NT$ ${serviceDetails.platform.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.premium.price.toLocaleString()}`])
+      serviceComparisonData.push(['硬體基礎層', `NT$ ${serviceDetails.hardware.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.premium.price.toLocaleString()}`])
+      serviceComparisonData.push(['組合總價', `NT$ ${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}`])
       const serviceComparisonWS = XLSX.utils.aoa_to_sheet(serviceComparisonData)
       XLSX.utils.book_append_sheet(workbook, serviceComparisonWS, '服務功能對照表')
 
