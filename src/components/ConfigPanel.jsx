@@ -1,10 +1,23 @@
 import React from 'react'
+import TaxIdLookup from './TaxIdLookup'
 
 const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDetails, shiftPatterns }) => {
   const handleCompanyInfoChange = (field, value) => {
     setCompanyInfo(prev => ({
       ...prev,
       [field]: value
+    }))
+  }
+
+  // 處理統編查詢結果自動填入
+  const handleCompanyInfoFound = (foundInfo) => {
+    setCompanyInfo(prev => ({
+      ...prev,
+      companyName: foundInfo.companyName || prev.companyName,
+      address: foundInfo.address || prev.address,
+      contact: foundInfo.contact || prev.contact,
+      taxId: foundInfo.taxId || prev.taxId,
+      phone: foundInfo.phone || prev.phone
     }))
   }
 
@@ -73,6 +86,10 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
       
       <div className="config-section">
         <h3>📋 公司資訊</h3>
+        
+        {/* 統編查詢功能 */}
+        <TaxIdLookup onCompanyInfoFound={handleCompanyInfoFound} />
+        
         <div className="company-info-grid">
           <div className="company-col">
             <label>
@@ -81,6 +98,11 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
                 type="text" 
                 value={companyInfo.companyName}
                 onChange={(e) => handleCompanyInfoChange('companyName', e.target.value)}
+                placeholder="可通過統編查詢自動填入"
+                style={{
+                  background: companyInfo.companyName ? '#f0fff0' : 'white',
+                  borderColor: companyInfo.companyName ? '#4caf50' : '#ced4da'
+                }}
               />
             </label>
             <label>
@@ -89,6 +111,11 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
                 type="text" 
                 value={companyInfo.address}
                 onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
+                placeholder="可通過統編查詢自動填入"
+                style={{
+                  background: companyInfo.address ? '#f0fff0' : 'white',
+                  borderColor: companyInfo.address ? '#4caf50' : '#ced4da'
+                }}
               />
             </label>
             <label>
@@ -97,6 +124,11 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
                 type="text" 
                 value={companyInfo.contact}
                 onChange={(e) => handleCompanyInfoChange('contact', e.target.value)}
+                placeholder="可通過統編查詢自動填入"
+                style={{
+                  background: companyInfo.contact ? '#f0fff0' : 'white',
+                  borderColor: companyInfo.contact ? '#4caf50' : '#ced4da'
+                }}
               />
             </label>
           </div>
@@ -107,7 +139,17 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
                 type="text" 
                 value={companyInfo.taxId}
                 onChange={(e) => handleCompanyInfoChange('taxId', e.target.value)}
+                placeholder="可使用上方查詢功能自動填入"
+                style={{
+                  background: companyInfo.taxId ? '#f0fff0' : 'white',
+                  borderColor: companyInfo.taxId ? '#4caf50' : '#ced4da'
+                }}
               />
+              {companyInfo.taxId && (
+                <small style={{color: '#4caf50', fontSize: '12px'}}>
+                  ✓ 統編已填入
+                </small>
+              )}
             </label>
             <label>
               電話:
