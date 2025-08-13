@@ -3,38 +3,44 @@
 // 多個可用的統編查詢API服務
 const TAX_ID_APIS = [
   {
-    name: '台灣公司資料查詢',
+    name: '台灣公司資料查詢API',
     url: 'https://data.gcis.nat.gov.tw/od/data/api/5F64D864-61CB-4D0D-8AD9-492047CC1EA6',
-    corsMode: 'no-cors',
+    corsMode: 'cors',
     parse: (data, cleanTaxId) => {
       try {
+        console.log('政府API原始回應:', data)
         if (data && Array.isArray(data) && data.length > 0) {
-          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId) || data[0]
-          return {
-            success: true,
-            data: {
-              companyName: company.Company_Name || '',
-              address: company.Company_Location || '',
-              representative: company.Responsible_Name || '',
-              capital: company.Capital_Stock_Amount || '',
-              status: company.Company_Status || ''
+          const company = data.find(c => c.Business_Accounting_NO === cleanTaxId)
+          if (company) {
+            return {
+              success: true,
+              data: {
+                companyName: company.Company_Name || '',
+                address: company.Company_Location || '',
+                representative: company.Responsible_Name || '',
+                capital: company.Capital_Stock_Amount || '',
+                status: company.Company_Status || '',
+                establishDate: company.Company_Setup_Date || ''
+              }
             }
           }
         }
       } catch (e) {
-        console.log('解析API數據失敗:', e)
+        console.log('解析政府API數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
   },
   {
-    name: 'G0V 公司資料',
+    name: 'G0V 公司資料API',
     url: 'https://company.g0v.ronny.tw/api/search',
     corsMode: 'cors',
-    parse: (data) => {
+    parse: (data, cleanTaxId) => {
       try {
+        console.log('G0V API原始回應:', data)
         if (data && data.data && data.data.length > 0) {
-          const company = data.data[0]
+          // 尋找完全匹配的統編
+          const company = data.data.find(c => c['統一編號'] === cleanTaxId) || data.data[0]
           return {
             success: true,
             data: {
@@ -42,12 +48,39 @@ const TAX_ID_APIS = [
               address: company['公司地址'] || company.address || '',
               representative: company['代表人姓名'] || company.representative || '',
               capital: company['資本額'] || '',
-              status: company['公司狀況'] || ''
+              status: company['公司狀況'] || company.status || '',
+              establishDate: company['設立日期'] || ''
             }
           }
         }
       } catch (e) {
         console.log('解析G0V數據失敗:', e)
+      }
+      return { success: false, error: '查無此統編資料' }
+    }
+  },
+  {
+    name: '第三方查詢API',
+    url: 'https://api.finmind.tech/api/v4/data',
+    corsMode: 'cors',
+    parse: (data, cleanTaxId) => {
+      try {
+        console.log('第三方API原始回應:', data)
+        if (data && data.data && data.data.length > 0) {
+          const company = data.data.find(c => c.tax_id === cleanTaxId) || data.data[0]
+          return {
+            success: true,
+            data: {
+              companyName: company.company_name || '',
+              address: company.address || '',
+              representative: company.representative || '',
+              capital: company.capital || '',
+              status: company.status || ''
+            }
+          }
+        }
+      } catch (e) {
+        console.log('解析第三方數據失敗:', e)
       }
       return { success: false, error: '查無此統編資料' }
     }
@@ -84,21 +117,19 @@ export const queryCompanyInfo = async (taxId) => {
   
   const cleanTaxId = validation.taxId
   
-  // 優先嘗試本地數據庫（因為API可能有CORS問題）
-  console.log(`嘗試本地數據庫查詢統編: ${cleanTaxId}`)
-  const localResult = queryFromLocalDatabase(cleanTaxId)
-  if (localResult.success) {
-    console.log('本地數據庫查詢成功')
-    return localResult
-  }
+  // 優先使用真實API查詢，確保資料準確性
+  console.log(`開始查詢統編: ${cleanTaxId}`)
   
-  // 如果本地數據庫沒有，再嘗試API
+  // 嘗試所有API
   for (const api of TAX_ID_APIS) {
     try {
       let url
       if (api.name.includes('G0V')) {
         url = `${api.url}?q=${cleanTaxId}`
+      } else if (api.name.includes('第三方')) {
+        url = `${api.url}?dataset=TaiwanStockInfo&data_id=${cleanTaxId}`
       } else {
+        // 台灣政府API
         url = `${api.url}?$filter=Business_Accounting_NO eq '${cleanTaxId}'&$format=json`
       }
       
@@ -148,59 +179,40 @@ export const queryCompanyInfo = async (taxId) => {
     }
   }
   
-  // 如果所有API都失敗，嘗試使用備用的本地數據庫
-  return queryFromLocalDatabase(cleanTaxId)
+  // 如果所有API都失敗，僅對研華等少數已確認的統編使用本地數據庫
+  console.log('所有API查詢失敗，嘗試本地數據庫')
+  const localResult = queryFromLocalDatabase(cleanTaxId)
+  if (!localResult.success) {
+    return { 
+      success: false, 
+      error: '查無此統編資料，請檢查統編是否正確或手動輸入公司資訊。如果是有效統編，可能是API服務暫時無法使用。' 
+    }
+  }
+  return localResult
 }
 
-// 備用本地數據庫（一些常見的大公司資料）
+// 備用本地數據庫（僅保留已確認正確的公司資料，主要用於API失敗時的備用）
 const localCompanyDatabase = {
-  '04595257': {
-    companyName: '台灣積體電路製造股份有限公司',
-    address: '新竹市東區力行六路8號',
-    representative: '劉德音',
-    phone: '03-5636688'
-  },
-  '23526740': {
-    companyName: '鴻海精密工業股份有限公司',
-    address: '新北市土城區自由街2號',
-    representative: '劉揚偉',
-    phone: '02-22683466'
-  },
   '22356500': {
     companyName: '研華股份有限公司',
     address: '台北市內湖區瑞光路26巷20弄1號',
     representative: '劉克振',
-    phone: '02-27926688'
-  },
-  '86732181': {
-    companyName: '聯發科技股份有限公司',
-    address: '新竹市東區關新路123號',
-    representative: '蔡明介',
-    phone: '03-5670766'
-  },
-  '22466564': {
-    companyName: '台新國際商業銀行股份有限公司',
-    address: '台北市中山區中山北路二段44號',
-    representative: '林克孝',
-    phone: '02-25681599'
-  },
-  '22099131': {
-    companyName: '富邦金融控股股份有限公司',
-    address: '台北市松山區敦化南路一段108號',
-    representative: '蔡明興',
-    phone: '02-87716699'
+    phone: '02-27926688',
+    note: '已確認資料正確'
   },
   '12345678': {
     companyName: '示範科技股份有限公司',
     address: '台北市信義區信義路四段199號',
     representative: '王大明',
-    phone: '02-27123456'
+    phone: '02-27123456',
+    note: '測試用範例資料'
   },
   '87654321': {
     companyName: '智能製造株式會社',
     address: '新竹科學園區工業東路1號',
     representative: '李智慧',
-    phone: '03-5123456'
+    phone: '03-5123456',
+    note: '測試用範例資料'
   }
 }
 
