@@ -167,6 +167,9 @@ export const queryCompanyInfo = async (taxId) => {
       if (api.name.includes('OpenData VIP')) {
         fetchOptions.mode = 'cors'
         fetchOptions.credentials = 'omit'
+        // 移除可能導致CORS問題的headers
+        delete fetchOptions.headers['Content-Type']
+        delete fetchOptions.headers['User-Agent']
       } else if (api.corsMode) {
         fetchOptions.mode = api.corsMode
       }
@@ -202,16 +205,18 @@ export const queryCompanyInfo = async (taxId) => {
     }
   }
   
-  // 如果所有API都失敗，僅對研華等少數已確認的統編使用本地數據庫
+  // 如果所有API都失敗，嘗試本地數據庫
   console.log('所有API查詢失敗，嘗試本地數據庫')
   const localResult = queryFromLocalDatabase(cleanTaxId)
-  if (!localResult.success) {
-    return { 
-      success: false, 
-      error: '查無此統編資料，請檢查統編是否正確或手動輸入公司資訊。如果是有效統編，可能是API服務暫時無法使用。' 
-    }
+  if (localResult.success) {
+    return localResult
   }
-  return localResult
+
+  // 所有查詢都失敗，提供詳細的錯誤資訊
+  return { 
+    success: false, 
+    error: `統編 ${cleanTaxId} 查無資料。可能原因：\n1. 統編號碼有誤\n2. 該統編尚未設立或已解散\n3. API服務暫時無法使用\n\n請檢查統編號碼或手動輸入公司資訊。` 
+  }
 }
 
 // 備用本地數據庫（僅保留已確認正確的公司資料，主要用於API失敗時的備用）
