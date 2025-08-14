@@ -1,9 +1,10 @@
-# WISE-IoT SRP 維護服務效益評估系統 V2.1.5
+# WISE-IoT SRP 維護服務效益評估系統 V2.1.7
 
 [![Deploy Status](https://img.shields.io/badge/deploy-automated-brightgreen)](https://benefit-eval-system.vercel.app/)
-[![Version](https://img.shields.io/badge/version-2.1.5-blue)](#版本歷程)
+[![Version](https://img.shields.io/badge/version-2.1.7-blue)](#版本歷程)
 [![React](https://img.shields.io/badge/React-18+-61dafb)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646cff)](https://vitejs.dev/)
+[![CoreUI](https://img.shields.io/badge/CoreUI-5.7+-blue)](https://coreui.io/)
 
 > 🎯 **智能報價系統**: 專為 WISE-IoT SRP 維護服務設計的成本效益評估與報價生成平台
 
@@ -13,13 +14,15 @@ WISE-IoT SRP 維護服務效益評估系統是一個專業的報價生成平台�
 
 ### 🌟 核心特色
 
+- **🎨 現代化 UI**: 採用 CoreUI 5.7+ 企業級設計系統，專業美觀的管理介面
 - **🔍 智能統編查詢**: 自動查詢台灣公司統編，快速填入公司基本資訊
 - **🏭 班別風險分析**: 根據不同生產班別自動調整風險係數和成本評估
-- **⚙️ 動態服務配置**: 彈性配置平台與硬體服務項目和價格
+- **⚙️ 動態服務配置**: 支援拖拽排序、方案複製與彈性編輯，直觀管理服務項目
 - **📊 即時成本分析**: 智能計算停機損失、投資回報期與風險評估
 - **🧭 導航錨點系統**: 一鍵快速定位到各個編輯區域，支援完整操作手冊
 - **📄 智能分析報價**: PDF包含完整班別風險分析、停機損失計算與投資回報評估
 - **📧 現代化溝通**: Email聯絡方式，適應現代商務需求
+- **🖱️ 拖拽功能**: 直觀的拖拽操作，輕鬆調整服務方案排序
 
 ## 🚀 系統功能
 
@@ -57,6 +60,8 @@ WISE-IoT SRP 維護服務效益評估系統是一個專業的報價生成平台�
 
 ### 前端技術棧
 - **React 18+**: 現代化前端框架
+- **CoreUI 5.7+**: 企業級 Bootstrap 設計系統
+- **CoreUI Icons**: 專業圖標字體庫，取代 emoji 提升專業度
 - **Vite 5+**: 高性能構建工具
 - **ES6+ JavaScript**: 現代 JavaScript 語法
 - **CSS3**: 響應式設計與動畫效果
@@ -131,21 +136,50 @@ npm run build
 ```
 src/
 ├── components/          # React 組件
-│   ├── ConfigPanel.jsx     # 配置面板
-│   ├── ComparisonTable.jsx # 比較表格
-│   ├── ExportButtons.jsx   # 匯出功能
-│   ├── TaxIdLookup.jsx     # 統編查詢
-│   ├── UserGuide.jsx       # 導航指南
-│   └── PDFQuote.jsx        # PDF報價模板
+│   ├── ConfigPanel.jsx        # 配置面板（支援拖拽排序）
+│   ├── ServiceConfigCard.jsx  # CoreUI 服務配置卡片組件
+│   ├── ComparisonTable.jsx    # 比較表格
+│   ├── ExportButtons.jsx      # 匯出功能
+│   ├── TaxIdLookup.jsx        # 統編查詢
+│   ├── UserGuide.jsx          # CoreUI 導航指南
+│   └── PDFQuote.jsx           # PDF報價模板
 ├── utils/              # 工具函式
-│   └── taxIdService.js     # 統編查詢服務
-└── App.jsx             # 主應用程式
+│   └── taxIdService.js        # 統編查詢服務
+└── App.jsx             # 主應用程式（CoreUI 管理介面）
 
 api/
 └── taxid.js            # Vercel API 代理
 ```
 
 ## 📈 版本歷程
+
+### V2.1.7 (2025-08-14) - CoreUI 企業級 UI 設計系統完整導入
+**🎨 重大 UI 升級**:
+- 🚀 **CoreUI 5.7+ 導入**: 完整採用 CoreUI React 企業級設計系統
+- 🖼️ **圖標字體升級**: 使用 CoreUI Icons 取代所有 emoji，提升專業度
+- 🖱️ **拖拽功能**: 實現服務方案拖拽排序，支援方案複製與刪除
+- 🎛️ **管理介面**: 專業的左側導航 + 主內容區域布局
+- 📋 **組件化重構**: 創建 ServiceConfigCard 組件，提升代碼可維護性
+
+**💡 用戶體驗改進**:
+- 🔧 **輸入框修復**: 解決拖拽元素中輸入框無法編輯的問題
+- 📝 **方案名稱編輯**: 方案名稱移至「啟用此方案」下方，邏輯更清晰
+- 🎯 **字段順序優化**: 統一為「方案名稱 → 產品編號 → 服務標題 → 價格」
+- 🌙 **主題簡化**: 移除日夜模式切換，維持乾淨的亮色專業主題
+- 🧭 **導航優化**: 左側導航文字與圖標使用白色，提升可讀性
+
+**🛠️ 技術改進**:
+- 新增 @coreui/react, @coreui/icons, @coreui/icons-react 依賴
+- 完整重構 App.jsx 為管理介面布局
+- 創建專業的服務配置卡片組件
+- 優化 CSS 支援 CoreUI 組件系統
+- 修復所有拖拽相關的交互問題
+
+### V2.1.6 (2025-08-14) - 界面優化與輸入修復
+**🔧 關鍵修復**:
+- 修復方案名稱輸入框無法編輯問題
+- 優化服務配置界面排版
+- 加強輸入框可編輯性支援
 
 ### V2.1.5 (2025-08-14) - 計算邏輯硬編碼問題修正與性能監控
 **🔧 關鍵修正**:
@@ -274,6 +308,6 @@ api/
 
 **🤖 Generated with [Claude Code](https://claude.ai/code)**
 
-*Last Updated: 2025-08-14*
+*Last Updated: 2025-08-14 - V2.1.7 CoreUI Complete Redesign*
 
 </div>
