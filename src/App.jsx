@@ -169,6 +169,24 @@ function App() {
 
   return (
     <div className="App">
+      {/* 版本號顯示 */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '15px',
+        background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+        color: 'white',
+        padding: '6px 12px',
+        borderRadius: '15px',
+        fontSize: '12px',
+        fontWeight: '600',
+        zIndex: 1000,
+        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
+        border: '1px solid rgba(255,255,255,0.2)'
+      }}>
+        V2.1.1
+      </div>
+      
       <div className="main-layout">
         {/* 左側使用指南 */}
         <div className="sidebar">
