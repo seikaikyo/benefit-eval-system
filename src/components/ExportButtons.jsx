@@ -4,7 +4,7 @@ import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
 import { pdf } from '@react-pdf/renderer'
 import PDFQuote from './PDFQuote'
-import ReactPDFQuote from './ReactPDFQuote'
+import ReactPDFQuoteSimple from './ReactPDFQuoteSimple'
 import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
@@ -255,7 +255,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       setCurrentStep('正在生成React PDF文件...')
 
       // 生成PDF文檔
-      const doc = <ReactPDFQuote 
+      const doc = <ReactPDFQuoteSimple 
         companyInfo={companyInfo} 
         serviceDetails={serviceDetails} 
         shiftPatterns={shiftPatterns} 

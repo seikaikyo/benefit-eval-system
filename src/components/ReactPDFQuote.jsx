@@ -1,15 +1,14 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
-// 定義PDF樣式
+// 定義PDF樣式 - 移除fontFamily讓react-pdf使用預設字體
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 20,
-    fontSize: 10,
-    fontFamily: 'Helvetica'
+    fontSize: 10
   },
   header: {
     backgroundColor: '#667eea',
@@ -39,65 +38,50 @@ const styles = StyleSheet.create({
     paddingBottom: 5
   },
   table: {
-    display: 'table',
-    width: 'auto',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    width: '100%',
     marginBottom: 20
   },
   tableRow: {
-    margin: 'auto',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    minHeight: 25
   },
   tableHeader: {
     backgroundColor: '#f8f9fa',
-    fontWeight: 'bold'
-  },
-  tableCol: {
-    width: '25%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    padding: 8
+    fontWeight: 'bold',
+    borderBottomWidth: 2,
+    borderBottomColor: '#dee2e6'
   },
   tableColHeader: {
     width: '40%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
     padding: 8,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f5f5f5',
+    borderRightWidth: 1,
+    borderRightColor: '#e0e0e0'
   },
   tableColContent: {
     width: '20%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
     padding: 8,
+    borderRightWidth: 1,
+    borderRightColor: '#e0e0e0',
     textAlign: 'center'
   },
   tableCell: {
-    fontSize: 9,
-    textAlign: 'center'
+    fontSize: 9
   },
   tableCellLeft: {
-    fontSize: 9,
-    textAlign: 'left'
+    fontSize: 9
   },
   checkmark: {
-    color: '#4caf50',
-    fontWeight: 'bold'
+    color: '#4caf50'
   },
   cross: {
-    color: '#f44336',
-    fontWeight: 'bold'
+    color: '#f44336'
   },
   priceHighlight: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#d32f2f',
-    textAlign: 'center'
+    fontSize: 11,
+    color: '#d32f2f'
   },
   categoryHeader: {
     backgroundColor: '#e3f2fd',
