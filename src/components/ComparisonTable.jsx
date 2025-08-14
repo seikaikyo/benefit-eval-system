@@ -299,7 +299,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </h4>
             <p style={{margin: '0', fontSize: '14px', opacity: 0.9}}>
               工作時間：{shiftPatterns[companyInfo.shiftPattern].workingHours}小時/天 | 
-              風險係數：{(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+              風險係數：{(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x
             </p>
           </div>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'center'}}>
@@ -346,7 +346,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
                 損失{Math.round(calculateHourlyRevenue() * 2 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 2}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+                基本損失{calculateHourlyRevenue() * 2}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ff9800', borderRadius: '10px', background: 'white'}}>
@@ -355,7 +355,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
                 損失{Math.round(calculateHourlyRevenue() * 4 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 4}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+                基本損失{calculateHourlyRevenue() * 4}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #f44336', borderRadius: '10px', background: 'white'}}>
@@ -364,7 +364,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
                 損失{Math.round(calculateHourlyRevenue() * 8 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 8}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%風險係數
+                基本損失{calculateHourlyRevenue() * 8}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
           </div>

@@ -30,7 +30,10 @@
       "Bash(curl:*)",
       "Bash(ss:*)",
       "WebFetch(domain:data.gcis.nat.gov.tw)",
-      "WebFetch(domain:opendata.vip)"
+      "WebFetch(domain:opendata.vip)",
+      "WebFetch(domain:benefit-eval-system.vercel.app)",
+      "Bash(touch:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }
