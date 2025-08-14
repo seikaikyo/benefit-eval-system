@@ -388,7 +388,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#f44336', fontWeight: '600'}}>Basic MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</p>
             <p style={{color: '#f44336', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>❌ 高風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / calculateHourlyRevenue()).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
           </div>
 
           {/* Advanced方案 */}
@@ -402,7 +402,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#ff9800', fontWeight: '600'}}>Advanced MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</p>
             <p style={{color: '#ff9800', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>⚠️ 中等風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced')) / calculateHourlyRevenue() + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced')) / (calculateHourlyRevenue() * 10000) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
           </div>
 
           {/* Premium方案 */}
@@ -440,7 +440,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             
             <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
               <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>⚡ 回本速度極快</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本</p>
+              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本</p>
               <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
             </div>
           </div>
@@ -466,10 +466,10 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <span style={{color: '#4caf50'}}>{(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
             <span style={{margin: '0 20px', color: '#666', fontSize: '24px'}}>&lt;</span>
-            <span style={{color: '#f44336'}}>{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
+            <span style={{color: '#f44336'}}>{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
           </div>
           <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
-            避免{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本
+            避免{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本
           </div>
         </div>
 

@@ -1,7 +1,7 @@
-# WISE-IoT SRP 維護服務效益評估系統 V2.1
+# WISE-IoT SRP 維護服務效益評估系統 V2.1.4
 
 [![Deploy Status](https://img.shields.io/badge/deploy-automated-brightgreen)](https://benefit-eval-system.vercel.app/)
-[![Version](https://img.shields.io/badge/version-2.1.1-blue)](#版本歷程)
+[![Version](https://img.shields.io/badge/version-2.1.4-blue)](#版本歷程)
 [![React](https://img.shields.io/badge/React-18+-61dafb)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646cff)](https://vitejs.dev/)
 
@@ -137,6 +137,28 @@ api/
 ```
 
 ## 📈 版本歷程
+
+### V2.1.4 (2025-08-14) - 全面數值計算修正與PDF分頁優化
+**🎯 重大修正**:
+- 🔢 **計算精度全面修正**: 修正所有時營業額、停機損失與投資回報計算
+- 📄 **PDF分頁結構優化**: 實現理想三頁結構（平台服務→硬體服務→風險分析）
+- 💰 **單位一致性**: 統一萬元顯示單位，消除數值錯誤
+- 🛠️ **breakEvenHours修正**: 修正投資回本時間計算邏輯
+
+**📊 計算邏輯改進**:
+- 時營業額: 150000萬 → 17.1萬/小時 (正確)
+- 停機損失: 考慮風險係數的精確計算
+- 投資回本: serviceCost / (hourlyRevenue * 10000) 正確換算
+- 風險係數: 統一使用1.0x格式（非100%）
+
+**📄 PDF結構優化**:
+- 第1頁: 平台與應用層服務對照表
+- 第2頁: 硬體基礎層服務對照表
+- 第3頁: 班別風險分析與成本效益評估
+
+### V2.1.3 (2025-08-14) - 時營業額計算單位修正
+
+### V2.1.2 (2025-08-14) - 風險係數顯示格式統一
 
 ### V2.1.1 (2025-08-14) - 計算邏輯統一與PDF匯出優化  
 **🎯 高優先級修正**:
