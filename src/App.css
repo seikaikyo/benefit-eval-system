@@ -4,15 +4,205 @@ body {
   padding: 0;
   background-color: #f8f9fa;
   line-height: 1.6;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .App {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+  width: 100%;
 }
 
+/* CoreUI Admin Layout 樣式 */
+.admin-layout {
+  --cui-sidebar-brand-height: 56px;
+  --cui-sidebar-width: 256px;
+  background: #ebedef !important;
+  min-height: 100vh;
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100vw !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+/* CoreUI 左側邊欄 */
+.admin-sidebar {
+  width: var(--cui-sidebar-width);
+  background: #303c54;
+  color: #ffffff;
+  overflow-y: auto;
+  flex-shrink: 0;
+  height: 100vh;
+  border-right: 1px solid #d8dbe0;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+/* 左側邊欄導航文字和圖標顏色 */
+.admin-sidebar .sidebar-nav .nav-link {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .sidebar-nav .nav-icon {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .sidebar-nav .nav-title {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .sidebar-nav .nav-group-toggle {
+  color: #ffffff !important;
+}
+
+/* CoreUI 導航組件白色文字 */
+.admin-sidebar .c-sidebar-nav .c-nav-title,
+.admin-sidebar .c-sidebar-nav .c-nav-item .c-nav-link,
+.admin-sidebar .c-sidebar-nav .c-nav-group .c-nav-group-toggle {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .c-sidebar-nav .c-nav-item .nav-icon,
+.admin-sidebar .c-sidebar-nav .c-nav-group .nav-icon {
+  color: #ffffff !important;
+}
+
+/* CoreUI Logo區域 */
+.admin-logo {
+  height: var(--cui-sidebar-brand-height);
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  background: #263447;
+  border-bottom: 1px solid #404c63;
+}
+
+.admin-logo h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-logo span {
+  font-size: 12px;
+  opacity: 0.8;
+  display: block;
+  margin-top: 2px;
+  color: #8a9ba8;
+}
+
+/* CoreUI 版本標籤 */
+.version-badge {
+  position: fixed;
+  top: 12px;
+  right: 20px;
+  background: #321fdb;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+
+/* CoreUI 右側主內容區 */
+.admin-main {
+  flex: 1 !important;
+  background: #ebedef;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: 100vh;
+  width: calc(100vw - var(--cui-sidebar-width)) !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 移除舊的header相關樣式 */
+.admin-header {
+  display: none;
+}
+
+.admin-body {
+  display: none;
+}
+
+.admin-content {
+  padding: 1.5rem;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* CoreUI Card 樣式 */
+.admin-card {
+  background: #fff;
+  border: 1px solid #d8dbe0;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-card .card-body {
+  padding: 1.25rem;
+}
+
+/* 便利貼容器 */
+.sticky-notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+}
+
+/* 確保便利貼內容不溢出 */
+.sticky-notes-container > * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 新的admin dashboard布局 */
+.main-container {
+  flex: 1;
+  margin-left: 280px; /* 默認sidebar寬度 */
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.content-wrapper {
+  padding: 20px 30px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* 當sidebar收起時的布局 */
+.sidebar-collapsed .main-container {
+  margin-left: 60px;
+}
+
+/* 原有布局樣式保持向後兼容 */
 .main-layout {
   display: flex;
   gap: 20px;
@@ -39,6 +229,32 @@ body {
   display: flex;
   flex-direction: column;
   gap: 25px;
+}
+
+/* 響應式設計 */
+@media (max-width: 1200px) {
+  .main-container {
+    margin-left: 60px; /* 收縮模式 */
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    margin-left: 0;
+    padding-left: 0;
+  }
+  
+  .content-wrapper {
+    padding: 15px 20px;
+    gap: 20px;
+    max-width: 100%;
+  }
+}
+
+/* 確保內容不溢出 */
+.content-wrapper {
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Header styles */
@@ -191,27 +407,78 @@ body {
   color: #1976d2;
 }
 
+/* CoreUI 表單樣式 - 紅框區域上下排列 */
 .service-basic-info {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 15px;
-  margin-bottom: 20px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.service-basic-info .form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .service-basic-info label {
-  display: flex;
-  flex-direction: column;
-  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
   color: #495057;
-  font-size: 13px;
+  font-size: 0.875rem;
 }
 
 .service-basic-info input {
-  margin-top: 5px;
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 14px;
+  display: block !important;
+  width: 100% !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #495057 !important;
+  background-color: #fff !important;
+  background-clip: padding-box !important;
+  border: 1px solid #b6bbc6 !important;
+  border-radius: 0.375rem !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+  pointer-events: auto !important;
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+/* 確保CoreUI表單輸入框可編輯 */
+.form-control,
+input[type="text"],
+input[type="number"],
+textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+/* 強制修復拖拽卡片中的輸入框 */
+[draggable="true"] input,
+[draggable="true"] textarea {
+  pointer-events: auto !important;
+  cursor: text !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+[draggable="true"] input:focus,
+[draggable="true"] textarea:focus {
+  pointer-events: auto !important;
+  cursor: text !important;
+}
+
+.service-basic-info input:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #b6d7ff;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(50, 31, 219, 0.25);
 }
 
 /* Features Section */
@@ -294,8 +561,7 @@ body {
   }
   
   .service-basic-info {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 12px;
   }
   
   .service-header {
@@ -815,4 +1081,222 @@ body {
 .export-info strong {
   color: #333;
   font-size: 14px;
+}
+
+/* 服務方案操作按鈕樣式 */
+.service-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.service-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: none;
+  border: 2px solid transparent;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.duplicate-btn {
+  color: #1976d2;
+  border-color: #1976d2;
+  background: rgba(25, 118, 210, 0.05);
+}
+
+.duplicate-btn:hover {
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.delete-btn {
+  color: #d32f2f;
+  border-color: #d32f2f;
+  background: rgba(211, 47, 47, 0.05);
+}
+
+.delete-btn:hover {
+  background: #d32f2f;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
+}
+
+/* 拖拽手柄樣式 */
+.drag-handle {
+  color: #9e9e9e;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  letter-spacing: -2px;
+}
+
+.drag-handle:hover {
+  color: #1976d2;
+  background: rgba(25, 118, 210, 0.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  color: #0d47a1;
+}
+
+/* 拖拽時的視覺反饋 */
+.service-config:hover {
+  border: 2px solid #e3f2fd;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+}
+
+.service-config[draggable]:hover {
+  border: 2px solid #1976d2;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.2);
+}
+
+/* 模組名稱標示 */
+.module-label,
+.module-label-right {
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.module-label-right {
+  right: 20px;
+  left: auto;
+}
+
+/* PDF分頁虛線標示 */
+.pdf-page-break {
+  border-top: 3px dashed #e53935;
+  margin: 30px 0;
+  position: relative;
+  height: 0;
+}
+
+.pdf-page-break::before {
+  content: '📄 PDF 分頁點';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #e53935;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pdf-page-break.page-1::before {
+  content: '📄 PDF 第一頁結束';
+}
+
+.pdf-page-break.page-2::before {
+  content: '📄 PDF 第二頁結束';
+}
+
+.pdf-page-break.page-3::before {
+  content: '📄 PDF 第三頁結束';
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .service-title-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .service-actions {
+    justify-content: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* 水平服務分類布局 */
+.service-category-horizontal {
+  margin-bottom: 40px;
+}
+
+.service-category-horizontal h4 {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* 水平服務網格 - 3個方案並排 */
+.services-grid-horizontal {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* CoreUI 服務配置卡片樣式 */
+.services-grid-horizontal .service-config {
+  background: #fff;
+  border: 1px solid #d8dbe0;
+  border-radius: 0.375rem;
+  padding: 1.25rem;
+  transition: all 0.15s ease-in-out;
+  min-height: 28rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.services-grid-horizontal .service-config:hover {
+  border-color: #321fdb;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.services-grid-horizontal .service-config[draggable="true"] {
+  cursor: grab;
+}
+
+.services-grid-horizontal .service-config[draggable="true"]:hover {
+  transform: translateY(-2px);
+}
+
+/* 響應式調整 - 水平布局 */
+@media (max-width: 1200px) {
+  .services-grid-horizontal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .services-grid-horizontal {
+    grid-template-columns: 1fr;
+  }
 }

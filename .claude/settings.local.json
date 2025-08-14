@@ -39,7 +39,12 @@
       "Bash(vercel:*)",
       "Bash(npm audit:*)",
       "Bash(npm update:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(kill:*)",
+      "WebFetch(domain:codervent.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:coreui.io)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

@@ -1,5 +1,27 @@
 import React from 'react'
 import TaxIdLookup from './TaxIdLookup'
+import ServiceConfigCard from './ServiceConfigCard'
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
+  CRow,
+  CForm,
+  CFormLabel,
+  CFormInput,
+  CInputGroup,
+  CButton,
+  CButtonGroup,
+  CFormCheck,
+  CFormTextarea,
+  CBadge
+} from '@coreui/react'
+import {
+  cilSettings,
+  cilIndustry
+} from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 
 const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDetails, shiftPatterns }) => {
   const handleCompanyInfoChange = (field, value) => {
@@ -19,6 +41,80 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
       taxId: foundInfo.taxId || prev.taxId,
       phone: foundInfo.phone || prev.phone
     }))
+  }
+
+  // 處理服務方案複製
+  const handleServiceDuplicate = (category, serviceKey) => {
+    const originalService = serviceDetails[category][serviceKey]
+    const newKey = `${serviceKey}_copy_${Date.now()}`
+    const newService = {
+      ...originalService,
+      title: `${originalService.title} (複製)`,
+      enabled: false
+    }
+    
+    setServiceDetails(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [newKey]: newService
+      }
+    }))
+  }
+
+  // 處理服務方案刪除
+  const handleServiceDelete = (category, serviceKey) => {
+    setServiceDetails(prev => {
+      const newCategory = { ...prev[category] }
+      delete newCategory[serviceKey]
+      return {
+        ...prev,
+        [category]: newCategory
+      }
+    })
+  }
+
+  // 處理拖拽開始
+  const handleDragStart = (e, category, serviceKey) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ category, serviceKey }))
+    e.target.style.opacity = '0.5'
+  }
+
+  // 處理拖拽結束
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1'
+  }
+
+  // 處理放置區域
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  // 處理放置
+  const handleDrop = (e, targetCategory, targetServiceKey) => {
+    e.preventDefault()
+    
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'))
+    const { category: sourceCategory, serviceKey: sourceServiceKey } = data
+    
+    if (sourceCategory !== targetCategory || sourceServiceKey === targetServiceKey) {
+      return
+    }
+
+    // 重新排序
+    setServiceDetails(prev => {
+      const categoryServices = Object.entries(prev[sourceCategory])
+      const sourceIndex = categoryServices.findIndex(([key]) => key === sourceServiceKey)
+      const targetIndex = categoryServices.findIndex(([key]) => key === targetServiceKey)
+      
+      const [movedService] = categoryServices.splice(sourceIndex, 1)
+      categoryServices.splice(targetIndex, 0, movedService)
+      
+      return {
+        ...prev,
+        [sourceCategory]: Object.fromEntries(categoryServices)
+      }
+    })
   }
 
   const handleServiceDetailsChange = (category, type, field, value) => {
@@ -231,163 +327,74 @@ const ConfigPanel = ({ companyInfo, setCompanyInfo, serviceDetails, setServiceDe
         </div>
       </div>
 
-      <div className="config-section">
-        <h3>📝 服務項目內容編輯</h3>
+      <CCard className="mb-4">
+        <CCardHeader>
+          <h5 className="mb-0">
+            <CIcon icon={cilSettings} className="me-2" />
+            服務項目內容編輯
+          </h5>
+        </CCardHeader>
+        <CCardBody>
         
-        <div id="service-config" className="service-category">
-          <h4>平台與應用層服務</h4>
-          {Object.entries(serviceDetails.platform).map(([type, config]) => (
-            <div key={type} className="service-config">
-              <div className="service-header">
-                <h5>{type.charAt(0).toUpperCase() + type.slice(1)} MA</h5>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    checked={config.enabled}
-                    onChange={(e) => handleServiceDetailsChange('platform', type, 'enabled', e.target.checked)}
-                  />
-                  啟用此方案
-                </label>
-              </div>
-              
-              {config.enabled && (
-                <>
-                  <div className="service-basic-info">
-                    <label>
-                      產品編號:
-                      <input 
-                        type="text" 
-                        value={config.productCode}
-                        onChange={(e) => handleServiceDetailsChange('platform', type, 'productCode', e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      服務標題:
-                      <input 
-                        type="text" 
-                        value={config.title}
-                        onChange={(e) => handleServiceDetailsChange('platform', type, 'title', e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      價格 (NT$):
-                      <input 
-                        type="number" 
-                        value={config.price}
-                        onChange={(e) => handleServiceDetailsChange('platform', type, 'price', parseInt(e.target.value) || 0)}
-                      />
-                    </label>
-                  </div>
-                  
-                  <div className="features-section">
-                    <h6>服務項目：</h6>
-                    {config.features.map((feature, index) => (
-                      <div key={index} className="feature-row">
-                        <input 
-                          type="text" 
-                          value={feature}
-                          onChange={(e) => handleFeatureChange('platform', type, index, e.target.value)}
-                        />
-                        <button 
-                          type="button" 
-                          onClick={() => removeFeature('platform', type, index)}
-                          className="remove-btn"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                    <button 
-                      type="button" 
-                      onClick={() => addFeature('platform', type)}
-                      className="add-btn"
-                    >
-                      + 新增項目
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+          {/* 平台與應用層服務 - CoreUI版本 */}
+          <div className="mb-5">
+            <h5 className="mb-3">
+              <CIcon icon={cilSettings} className="me-2" />
+              平台與應用層服務
+            </h5>
+            <CRow>
+              {Object.entries(serviceDetails.platform).map(([type, config]) => (
+                <ServiceConfigCard
+                  key={type}
+                  type={type}
+                  config={config}
+                  category="platform"
+                  onServiceChange={handleServiceDetailsChange}
+                  onServiceDuplicate={handleServiceDuplicate}
+                  onServiceDelete={handleServiceDelete}
+                  onFeatureChange={handleFeatureChange}
+                  onAddFeature={addFeature}
+                  onRemoveFeature={removeFeature}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  canDelete={Object.keys(serviceDetails.platform).length > 1}
+                />
+              ))}
+            </CRow>
+          </div>
 
-        <div className="service-category">
-          <h4>硬體基礎層服務</h4>
-          {Object.entries(serviceDetails.hardware).map(([type, config]) => (
-            <div key={type} className="service-config">
-              <div className="service-header">
-                <h5>{type.charAt(0).toUpperCase() + type.slice(1)} MA</h5>
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox" 
-                    checked={config.enabled}
-                    onChange={(e) => handleServiceDetailsChange('hardware', type, 'enabled', e.target.checked)}
-                  />
-                  啟用此方案
-                </label>
-              </div>
-              
-              {config.enabled && (
-                <>
-                  <div className="service-basic-info">
-                    <label>
-                      產品編號:
-                      <input 
-                        type="text" 
-                        value={config.productCode}
-                        onChange={(e) => handleServiceDetailsChange('hardware', type, 'productCode', e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      服務標題:
-                      <input 
-                        type="text" 
-                        value={config.title}
-                        onChange={(e) => handleServiceDetailsChange('hardware', type, 'title', e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      價格 (NT$):
-                      <input 
-                        type="number" 
-                        value={config.price}
-                        onChange={(e) => handleServiceDetailsChange('hardware', type, 'price', parseInt(e.target.value) || 0)}
-                      />
-                    </label>
-                  </div>
-                  
-                  <div className="features-section">
-                    <h6>服務項目：</h6>
-                    {config.features.map((feature, index) => (
-                      <div key={index} className="feature-row">
-                        <input 
-                          type="text" 
-                          value={feature}
-                          onChange={(e) => handleFeatureChange('hardware', type, index, e.target.value)}
-                        />
-                        <button 
-                          type="button" 
-                          onClick={() => removeFeature('hardware', type, index)}
-                          className="remove-btn"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                    <button 
-                      type="button" 
-                      onClick={() => addFeature('hardware', type)}
-                      className="add-btn"
-                    >
-                      + 新增項目
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+          {/* 硬體基礎層服務 - CoreUI版本 */}
+          <div className="mb-4">
+            <h5 className="mb-3">
+              <CIcon icon={cilIndustry} className="me-2" />
+              硬體基礎層服務
+            </h5>
+            <CRow>
+              {Object.entries(serviceDetails.hardware).map(([type, config]) => (
+                <ServiceConfigCard
+                  key={type}
+                  type={type}
+                  config={config}
+                  category="hardware"
+                  onServiceChange={handleServiceDetailsChange}
+                  onServiceDuplicate={handleServiceDuplicate}
+                  onServiceDelete={handleServiceDelete}
+                  onFeatureChange={handleFeatureChange}
+                  onAddFeature={addFeature}
+                  onRemoveFeature={removeFeature}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  canDelete={Object.keys(serviceDetails.hardware).length > 1}
+                />
+              ))}
+            </CRow>
+          </div>
+        </CCardBody>
+      </CCard>
 
       <div className="config-section">
         <h3>📊 服務項目對比表</h3>

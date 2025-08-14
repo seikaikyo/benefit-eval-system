@@ -1,11 +1,25 @@
 import { useState } from 'react'
+import '@coreui/coreui/dist/css/coreui.min.css'
 import './App.css'
 import ComparisonTable from './components/ComparisonTable'
 import ConfigPanel from './components/ConfigPanel'
 import ExportButtons from './components/ExportButtons'
 import UserGuide from './components/UserGuide'
+import { 
+  CButton, 
+  CSidebar, 
+  CSidebarBrand, 
+  CSidebarToggler,
+  CContainer,
+  CHeader,
+  CHeaderBrand,
+  CHeaderToggler
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilMoon, cilSun, cilMenu } from '@coreui/icons'
 
 function App() {
+  
   const [companyInfo, setCompanyInfo] = useState({
     companyName: '',
     address: '',
@@ -53,7 +67,8 @@ function App() {
         price: 210000,
         enabled: true,
         productCode: '32WSISPIT1EP01',
-        title: 'WISE-IoT SRP 維運 平台與應用層 Basic MA',
+        title: 'Basic MA',
+        serviceTitle: 'WISE-IoT SRP 維運 平台與應用層 Basic MA',
         features: [
           '5*8 WISE-PaaS 遠端技術支持',
           '軟體、韌體更新服務',
@@ -65,7 +80,8 @@ function App() {
         price: 272000,
         enabled: true,
         productCode: '32WSISPIT1EP01',
-        title: 'WISE-IoT SRP 維運 平台與應用層 Advanced MA',
+        title: 'Advanced MA',
+        serviceTitle: 'WISE-IoT SRP 維運 平台與應用層 Advanced MA',
         features: [
           '5*8 WISE-PaaS 遠端技術支持',
           '軟體、韌體更新服務',
@@ -89,7 +105,8 @@ function App() {
         price: 458000,
         enabled: true,
         productCode: '32WSISPIT1EP01',
-        title: 'WISE-IoT SRP 維運 平台與應用層 Premium MA',
+        title: 'Premium MA',
+        serviceTitle: 'WISE-IoT SRP 維運 平台與應用層 Premium MA',
         features: [
           '5*8 WISE-PaaS 遠端技術支持',
           '軟體、韌體更新服務',
@@ -117,7 +134,8 @@ function App() {
         price: 230000,
         enabled: true,
         productCode: 'HPC-8208-WS01-C*3, 968AC00100*2, UN0-2372G-BTO*1',
-        title: 'WISE-IoT SRP 維運 硬體基礎層 Basic MA',
+        title: 'Basic MA',
+        serviceTitle: 'WISE-IoT SRP 維運 硬體基礎層 Basic MA',
         features: [
           '5*8 技術支持',
           '工單系統/郵件/免付費電話',
@@ -129,7 +147,8 @@ function App() {
         price: 310000,
         enabled: true,
         productCode: 'HPC-8208-WS01-C*3, 968AC00100*2, UN0-2372G-BTO*1',
-        title: 'WISE-IoT SRP 維運 硬體基礎層 Advanced MA',
+        title: 'Advanced MA',
+        serviceTitle: 'WISE-IoT SRP 維運 硬體基礎層 Advanced MA',
         features: [
           '5*8 技術支持',
           '工單系統/郵件/免付費電話',
@@ -148,7 +167,8 @@ function App() {
         price: 500000,
         enabled: true,
         productCode: 'HPC-8208-WS01-C*3, 968AC00100*2, UN0-2372G-BTO*1',
-        title: 'WISE-IoT SRP 維運 硬體基礎層 Premium MA',
+        title: 'Premium MA',
+        serviceTitle: 'WISE-IoT SRP 維運 硬體基礎層 Premium MA',
         features: [
           '7*24 全時段技術支持',
           '工單系統/郵件/免付費電話',
@@ -168,34 +188,24 @@ function App() {
   })
 
   return (
-    <div className="App">
-      {/* 版本號顯示 */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '15px',
-        background: 'linear-gradient(135deg, #1976d2, #1565c0)',
-        color: 'white',
-        padding: '6px 12px',
-        borderRadius: '15px',
-        fontSize: '12px',
-        fontWeight: '600',
-        zIndex: 1000,
-        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
-        border: '1px solid rgba(255,255,255,0.2)'
-      }}>
-        V2.1.6
+    <div className="App admin-layout">
+      {/* 版本標籤 */}
+      <div className="version-badge">V2.1.6</div>
+      
+      {/* 左側邊欄 */}
+      <div className="admin-sidebar">
+        <div className="admin-logo">
+          <h1>🏭 WISE-IoT SRP</h1>
+        </div>
+        <UserGuide />
       </div>
       
-      <div className="main-layout">
-        {/* 左側使用指南 */}
-        <div className="sidebar">
-          <UserGuide />
-        </div>
-        
-        {/* 主要內容區域 */}
-        <div className="main-content">
-          <div className="container">
+      {/* 右側主內容區域 */}
+      <div className="admin-main">
+        <div className="admin-content">
+          {/* 配置面板模組 */}
+          <div className="admin-card">
+            <div className="module-label-right">配置模組 ConfigPanel</div>
             <ConfigPanel 
               companyInfo={companyInfo}
               setCompanyInfo={setCompanyInfo}
@@ -203,11 +213,27 @@ function App() {
               setServiceDetails={setServiceDetails}
               shiftPatterns={shiftPatterns}
             />
+          </div>
+          
+          {/* PDF第一頁分頁點 */}
+          <div className="pdf-page-break page-1"></div>
+          
+          {/* 比較表模組 */}
+          <div className="admin-card">
+            <div className="module-label-right">分析模組 ComparisonTable</div>
             <ComparisonTable 
               companyInfo={companyInfo}
               serviceDetails={serviceDetails}
               shiftPatterns={shiftPatterns}
             />
+          </div>
+          
+          {/* PDF第二頁分頁點 */}
+          <div className="pdf-page-break page-2"></div>
+          
+          {/* 匯出按鈕模組 */}
+          <div className="admin-card">
+            <div className="module-label-right">匯出模組 ExportButtons</div>
             <ExportButtons 
               companyInfo={companyInfo}
               serviceDetails={serviceDetails}
