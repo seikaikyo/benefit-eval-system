@@ -1,7 +1,7 @@
-# WISE-IoT SRP 維護服務效益評估系統 V2.1.4
+# WISE-IoT SRP 維護服務效益評估系統 V2.1.5
 
 [![Deploy Status](https://img.shields.io/badge/deploy-automated-brightgreen)](https://benefit-eval-system.vercel.app/)
-[![Version](https://img.shields.io/badge/version-2.1.4-blue)](#版本歷程)
+[![Version](https://img.shields.io/badge/version-2.1.5-blue)](#版本歷程)
 [![React](https://img.shields.io/badge/React-18+-61dafb)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646cff)](https://vitejs.dev/)
 
@@ -70,6 +70,7 @@ WISE-IoT SRP 維護服務效益評估系統是一個專業的報價生成平台�
 ### 部署平台
 - **Vercel**: 自動化部署與 CDN 加速
 - **GitHub**: 版本控制與持續整合
+- **Speed Insights**: Vercel 性能監控與分析
 
 ## 📱 使用指南
 
@@ -95,6 +96,14 @@ WISE-IoT SRP 維護服務效益評估系統是一個專業的報價生成平台�
 - `22099131`: 台灣積體電路製造股份有限公司
 - `22356500`: 研華股份有限公司  
 - `23526740`: 鴻海精密工業股份有限公司
+
+## 🛡️ 安全性說明
+
+### 已知安全問題
+- **xlsx@0.18.5**: 存在原型污染和ReDoS漏洞
+- **風險評估**: 低風險（僅客戶端使用，無伺服器端處理）
+- **減緩措施**: 僅用於Excel匯出功能，不處理外部輸入文件
+- **監控狀態**: 持續關注安全更新，考慮替代方案
 
 ## 🔧 本地開發
 
@@ -137,6 +146,26 @@ api/
 ```
 
 ## 📈 版本歷程
+
+### V2.1.5 (2025-08-14) - 計算邏輯硬編碼問題修正與性能監控
+**🔧 關鍵修正**:
+- 🐛 **硬編碼計算修正**: 修正ComparisonTable.jsx中未使用共用計算函數的問題
+- 🔄 **動態計算**: 確保班別變更時所有計算（停機風險、回本時間）正確更新
+- 📊 **計算統一性**: 統一使用calculateRevenue.downtimeRisk和breakEvenHours函數
+- ⚡ **性能監控**: 整合Vercel Speed Insights，提供即時性能分析
+- 🎯 **數值格式化**: 修正顯示格式不一致問題
+- 🛡️ **安全性說明**: 說明xlsx已知安全問題及風險評估
+
+**🚀 技術改進**:
+- 新增@vercel/speed-insights依賴包
+- 完全消除計算邏輯中的硬編碼問題
+- 確保所有組件使用統一的計算函數庫
+- 版本號更新至V2.1.5
+
+**🛡️ 安全性說明**:
+- xlsx@0.18.5存在已知安全漏洞(原型污染、ReDoS)
+- 當前使用情境風險低：僅用於客戶端Excel匯出
+- 無更新版本可修復，已評估風險可接受
 
 ### V2.1.4 (2025-08-14) - 全面數值計算修正與PDF分頁優化
 **🎯 重大修正**:

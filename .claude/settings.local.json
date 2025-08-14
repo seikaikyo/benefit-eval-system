@@ -34,7 +34,12 @@
       "WebFetch(domain:benefit-eval-system.vercel.app)",
       "Bash(touch:*)",
       "Bash(grep:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(gh repo view:*)",
+      "Bash(vercel:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm update:*)",
+      "Bash(npm view:*)"
     ],
     "deny": []
   }
