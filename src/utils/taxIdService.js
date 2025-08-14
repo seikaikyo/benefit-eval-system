@@ -115,20 +115,20 @@ export const calculateRevenue = {
     return Math.round(annualRevenueWan * 10000 / 365 / 10000)
   },
   
-  // 計算時營業額（元）
+  // 計算時營業額（萬元）
   hourly: (annualRevenueWan) => {
-    return Math.round(annualRevenueWan * 10000 / 365 / 24)
+    return parseFloat((annualRevenueWan / 365 / 24).toFixed(1))
   },
   
-  // 計算停機風險成本（含風險係數）
+  // 計算停機風險成本（含風險係數）- 返回萬元
   downtimeRisk: (annualRevenueWan, hours, riskMultiplier = 1) => {
-    const hourlyRevenue = Math.round(annualRevenueWan * 10000 / 365 / 24)
-    return Math.round(hourlyRevenue * hours * riskMultiplier)
+    const hourlyRevenue = parseFloat((annualRevenueWan / 365 / 24).toFixed(1))
+    return parseFloat((hourlyRevenue * hours * riskMultiplier).toFixed(1))
   },
   
   // 計算投資回本時間（小時）
   breakEvenHours: (serviceCost, annualRevenueWan) => {
-    const hourlyRevenue = Math.round(annualRevenueWan * 10000 / 365 / 24)
+    const hourlyRevenue = Math.round(annualRevenueWan * 10000 / 365 / 24) // 保持元為單位進行回本計算
     return parseFloat((serviceCost / hourlyRevenue).toFixed(1))
   }
 }
