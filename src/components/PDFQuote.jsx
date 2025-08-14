@@ -239,11 +239,29 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </table>
       </div>
 
-      {/* 分頁控制點 - 確保硬體基礎層從新頁開始 */}
+      {/* 🔵 第一頁結束點 - 平台與應用層服務表結束 */}
       <div style={{ 
-        pageBreakBefore: 'always',
-        height: '1px'
-      }}></div>
+        pageBreakAfter: 'always',
+        height: '30px',
+        marginTop: '25px',
+        borderBottom: '2px dashed #1976d2',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        <span style={{
+          background: 'white',
+          padding: '5px 15px',
+          fontSize: '12px',
+          color: '#1976d2',
+          fontWeight: 'bold',
+          border: '1px solid #1976d2',
+          borderRadius: '15px'
+        }}>
+          📄 第一頁結束（平台服務表）
+        </span>
+      </div>
 
       {/* 硬體基礎層服務對照表 */}
       <div style={{ 
@@ -538,6 +556,52 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </div>
       </div>
 
+      {/* 🟠 第二頁結束點 - 停機損失計算結束 */}
+      <div style={{ 
+        pageBreakAfter: 'always',
+        height: '30px',
+        marginTop: '25px',
+        borderBottom: '2px dashed #ff9800',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        <span style={{
+          background: 'white',
+          padding: '5px 15px',
+          fontSize: '12px',
+          color: '#ff9800',
+          fontWeight: 'bold',
+          border: '1px solid #ff9800',
+          borderRadius: '15px'
+        }}>
+          📅 第二頁結束（風險分析）
+        </span>
+      </div>
+
+      {/* 🟢 第三頁開始 - 投資回報分析 */}
+      <div style={{
+        height: '20px',
+        marginBottom: '15px',
+        borderTop: '2px dashed #4caf50',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        <span style={{
+          background: 'white',
+          padding: '5px 15px',
+          fontSize: '12px',
+          color: '#4caf50',
+          fontWeight: 'bold',
+          border: '1px solid #4caf50',
+          borderRadius: '15px'
+        }}>
+          📈 第三頁開始（投資回報分析）
+        </span>
+      </div>
 
       {/* 成本效益分析 */}
       <div style={{ 
