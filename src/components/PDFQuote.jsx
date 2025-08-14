@@ -148,9 +148,9 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </div>
       </div>
 
-      {/* 服務功能對照表 */}
+      {/* 平台與應用層服務對照表 */}
       <div style={{ 
-        marginBottom: '25px',
+        marginBottom: '20px',
         pageBreakInside: 'avoid',
         breakInside: 'avoid'
       }}>
@@ -161,23 +161,25 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           borderBottom: '1px solid #e0e0e0',
           paddingBottom: '8px'
         }}>
-          服務功能對照表
+          平台與應用層服務對照表
         </h3>
         <table style={{
           width: '100%',
           borderCollapse: 'collapse',
           fontSize: '11px',
-          pageBreakInside: 'auto', // 允許表格內部分頁
-          breakInside: 'auto'
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
         }}>
           <thead>
             <tr>
               <th style={{
                 border: '1px solid #ddd',
                 padding: '8px',
-                background: '#f5f5f5',
+                background: '#e3f2fd',
                 textAlign: 'left',
-                width: '40%'
+                width: '40%',
+                color: '#1976d2',
+                fontWeight: 'bold'
               }}>
                 維運功能項目
               </th>
@@ -211,18 +213,6 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </tr>
           </thead>
           <tbody>
-            {/* 平台與應用層 */}
-            <tr>
-              <td colSpan="4" style={{
-                border: '1px solid #ddd',
-                padding: '8px',
-                background: '#e3f2fd',
-                fontWeight: 'bold',
-                color: '#1976d2'
-              }}>
-                平台與應用層
-              </td>
-            </tr>
             {platformRows.map((row, index) => (
               <tr key={`platform-${index}`}>
                 <td style={{ border: '1px solid #ddd', padding: '6px' }}>{row.name}</td>
@@ -232,18 +222,88 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               </tr>
             ))}
             
-            {/* 硬體基礎層 */}
+            {/* 平台價格資訊 */}
+            <tr style={{ background: '#f9f9f9' }}>
+              <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>年度價格 (新台幣)</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#d32f2f' }}>
+                {formatPrice(serviceDetails.platform.basic.price)}
+              </td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#f57c00' }}>
+                {formatPrice(serviceDetails.platform.advanced.price)}
+              </td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#2e7d32' }}>
+                {formatPrice(serviceDetails.platform.premium.price)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 硬體基礎層服務對照表 */}
+      <div style={{ 
+        marginBottom: '20px',
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}>
+        <h3 style={{
+          fontSize: '16px',
+          color: '#9c27b0',
+          margin: '0 0 15px 0',
+          borderBottom: '1px solid #e0e0e0',
+          paddingBottom: '8px'
+        }}>
+          硬體基礎層服務對照表
+        </h3>
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '11px',
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
+        }}>
+          <thead>
             <tr>
-              <td colSpan="4" style={{
+              <th style={{
                 border: '1px solid #ddd',
                 padding: '8px',
                 background: '#f3e5f5',
-                fontWeight: 'bold',
-                color: '#9c27b0'
+                textAlign: 'left',
+                width: '40%',
+                color: '#9c27b0',
+                fontWeight: 'bold'
               }}>
-                硬體基礎層
-              </td>
+                維運功能項目
+              </th>
+              <th style={{
+                border: '1px solid #ddd',
+                padding: '8px',
+                background: '#ffebee',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Basic
+              </th>
+              <th style={{
+                border: '1px solid #ddd',
+                padding: '8px',
+                background: '#fff8e1',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Advanced
+              </th>
+              <th style={{
+                border: '1px solid #ddd',
+                padding: '8px',
+                background: '#e8f5e8',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Premium
+              </th>
             </tr>
+          </thead>
+          <tbody>
             {hardwareRows.map((row, index) => (
               <tr key={`hardware-${index}`}>
                 <td style={{ border: '1px solid #ddd', padding: '6px' }}>{row.name}</td>
@@ -252,57 +312,111 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
                 <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', color: row.premium === '✓' ? '#4caf50' : '#f44336', fontWeight: 'bold' }}>{row.premium}</td>
               </tr>
             ))}
-
-            {/* 價格資訊 */}
-            <tr>
-              <td colSpan="4" style={{
-                border: '1px solid #ddd',
-                padding: '8px',
-                background: '#f0f0f0',
-                fontWeight: 'bold'
-              }}>
-                年度價格 (新台幣)
-              </td>
-            </tr>
-            <tr>
-              <td style={{ border: '1px solid #ddd', padding: '6px' }}>平台與應用層</td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#d32f2f' }}>
-                {formatPrice(serviceDetails.platform.basic.price)}
-              </td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#f57c00' }}>
-                {formatPrice(serviceDetails.platform.advanced.price)}
-              </td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#2e7d32' }}>
-                {formatPrice(serviceDetails.platform.premium.price)}
-              </td>
-            </tr>
-            <tr>
-              <td style={{ border: '1px solid #ddd', padding: '6px' }}>硬體基礎層</td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#d32f2f' }}>
+            
+            {/* 硬體價格資訊 */}
+            <tr style={{ background: '#f9f9f9' }}>
+              <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>年度價格 (新台幣)</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#d32f2f' }}>
                 {formatPrice(serviceDetails.hardware.basic.price)}
               </td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#f57c00' }}>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#f57c00' }}>
                 {formatPrice(serviceDetails.hardware.advanced.price)}
               </td>
-              <td style={{ border: '1px solid #ddd', padding: '6px', textAlign: 'center', fontWeight: 'bold', color: '#2e7d32' }}>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#2e7d32' }}>
                 {formatPrice(serviceDetails.hardware.premium.price)}
               </td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 組合價格總表 */}
+      <div style={{ 
+        marginBottom: '25px',
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}>
+        <h3 style={{
+          fontSize: '16px',
+          color: '#ff9800',
+          margin: '0 0 15px 0',
+          borderBottom: '1px solid #e0e0e0',
+          paddingBottom: '8px'
+        }}>
+          組合方案價格總覽
+        </h3>
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '12px',
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
+        }}>
+          <thead>
+            <tr>
+              <th style={{
+                border: '2px solid #ff9800',
+                padding: '10px',
+                background: '#fff3e0',
+                textAlign: 'left',
+                width: '40%',
+                color: '#ff9800',
+                fontWeight: 'bold'
+              }}>
+                服務組合方案
+              </th>
+              <th style={{
+                border: '2px solid #ff9800',
+                padding: '10px',
+                background: '#ffebee',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Basic組合
+              </th>
+              <th style={{
+                border: '2px solid #ff9800',
+                padding: '10px',
+                background: '#fff8e1',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Advanced組合
+              </th>
+              <th style={{
+                border: '2px solid #ff9800',
+                padding: '10px',
+                background: '#e8f5e8',
+                textAlign: 'center',
+                width: '20%'
+              }}>
+                Premium組合
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             <tr style={{ background: '#fff3e0' }}>
-              <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>組合總價</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#d32f2f' }}>
+              <td style={{ border: '1px solid #ddd', padding: '10px', fontWeight: 'bold', fontSize: '14px' }}>年度總價格</td>
+              <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#d32f2f' }}>
                 {formatPrice(getCombinedPriceLocal('basic', 'basic'))}
               </td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#f57c00' }}>
+              <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#f57c00' }}>
                 {formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}
               </td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#2e7d32' }}>
+              <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#2e7d32' }}>
                 {formatPrice(getCombinedPriceLocal('premium', 'premium'))}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      {/* 分頁控制點 */}
+      <div style={{ 
+        pageBreakBefore: 'auto',
+        height: '1px',
+        marginBottom: '0px'
+      }}></div>
 
       {/* 班別風險分析 */}
       <div style={{ 
@@ -342,7 +456,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <div>
               <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>風險係數</div>
               <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#f44336' }}>
-                {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+                {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x
               </div>
             </div>
             <div>
@@ -391,7 +505,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               基本損失：{(calculateHourlyRevenue() * 2 / 10000).toFixed(1)}萬
             </div>
             <div style={{ marginBottom: '3px' }}>
-              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}
             </div>
             <div style={{ fontWeight: 'bold', color: '#f57c00' }}>
               總損失：{(calculateDowntimeRisk(2) / 10000).toFixed(1)}萬
@@ -409,7 +523,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               基本損失：{(calculateHourlyRevenue() * 4 / 10000).toFixed(1)}萬
             </div>
             <div style={{ marginBottom: '3px' }}>
-              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier * 100).toFixed(0)}%
+              風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}
             </div>
             <div style={{ fontWeight: 'bold', color: '#d32f2f' }}>
               總損失：{(calculateDowntimeRisk(4) / 10000).toFixed(1)}萬
@@ -417,6 +531,13 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           </div>
         </div>
       </div>
+
+      {/* 分頁控制點 */}
+      <div style={{ 
+        pageBreakBefore: 'auto',
+        height: '1px',
+        marginBottom: '0px'
+      }}></div>
 
       {/* 成本效益分析 */}
       <div style={{ 

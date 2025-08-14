@@ -7,6 +7,9 @@ import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdS
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const [showPDFPreview, setShowPDFPreview] = useState(false)
+  const [pdfProgress, setPdfProgress] = useState(0)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [currentStep, setCurrentStep] = useState('')
   // 智能分析服務適用性 (從 ComparisonTable 複製過來)
   const analyzeServiceSuitability = (category, type) => {
     const service = serviceDetails[category][type]
@@ -122,15 +125,21 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         return
       }
       
-      // 顯示PDF預覽
+      // 開始生成流程
+      setIsGenerating(true)
+      setPdfProgress(0)
+      setCurrentStep('正在準備PDF預覽...')
       setShowPDFPreview(true)
       
-      // 動態等待DOM更新完成
+      // 步驟1: DOM載入檢查
+      setCurrentStep('正在載入頁面內容...')
+      setPdfProgress(20)
+      
       await new Promise(resolve => {
         const checkElement = () => {
           const element = document.getElementById('pdf-quote-container')
           if (element && element.offsetHeight > 0) {
-            setTimeout(resolve, 200) // 額外等待渲染完成
+            setTimeout(resolve, 200)
           } else {
             setTimeout(checkElement, 50)
           }
@@ -143,9 +152,12 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         throw new Error('PDF容器元素未找到')
       }
       
-      // 優化的PDF生成設定
+      // 步驟2: 開始生成Canvas
+      setCurrentStep('正在渲染PDF內容...')
+      setPdfProgress(40)
+      
       const canvas = await html2canvas(element, {
-        scale: window.devicePixelRatio || 2, // 響應式縮放
+        scale: window.devicePixelRatio || 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -153,9 +165,8 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         height: element.scrollHeight,
         logging: false,
         removeContainer: true,
-        imageTimeout: 30000, // 增加超時時間
+        imageTimeout: 30000,
         onclone: (clonedDoc) => {
-          // 確保克隆文檔中的樣式正確
           const clonedElement = clonedDoc.getElementById('pdf-quote-container')
           if (clonedElement) {
             clonedElement.style.visibility = 'visible'
@@ -168,40 +179,53 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         throw new Error('PDF內容生成失敗，請檢查數據完整性')
       }
 
-      const imgData = canvas.toDataURL('image/png', 0.95) // 提高圖片品質
+      // 步驟3: 生成PDF
+      setCurrentStep('正在生成PDF文件...')
+      setPdfProgress(70)
+      
+      const imgData = canvas.toDataURL('image/png', 0.95)
       const pdf = new jsPDF('p', 'mm', 'a4')
       
-      const imgWidth = 210 // A4寬度(mm)
-      const pageHeight = 297 // A4高度(mm)  
+      const imgWidth = 210
+      const pageHeight = 297
       const imgHeight = (canvas.height * imgWidth) / canvas.width
       let heightLeft = imgHeight
       let position = 0
 
-      // 添加第一頁
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
       heightLeft -= pageHeight
 
-      // 如果內容超過一頁，添加後續頁面
       while (heightLeft >= 0) {
-        position = heightLeft - imgHeight // 負值向上移動圖片
+        position = heightLeft - imgHeight
         pdf.addPage()
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
         heightLeft -= pageHeight
       }
 
-      // 安全的檔名生成
+      // 步驟4: 保存文件
+      setCurrentStep('正在保存文件...')
+      setPdfProgress(90)
+      
       const safeCompanyName = companyInfo.companyName.replace(/[<>:"/\\|?*]/g, '_').trim()
       const safeDate = companyInfo.quoteDate.replace(/\//g, '')
       const fileName = `${safeCompanyName}_WISE-IoT_SRP維運服務報價書_${safeDate}.pdf`
       
       pdf.save(fileName)
       
-      // 隱藏PDF預覽
-      setShowPDFPreview(false)
+      // 完成
+      setCurrentStep('PDF生成完成！')
+      setPdfProgress(100)
+      
+      setTimeout(() => {
+        setShowPDFPreview(false)
+        setIsGenerating(false)
+        setPdfProgress(0)
+        setCurrentStep('')
+      }, 1000)
+      
     } catch (error) {
       console.error('PDF報價書匯出失敗:', error)
       
-      // 詳細的錯誤訊息
       let errorMessage = 'PDF報價書匯出失敗：\n'
       if (error.message.includes('容器元素')) {
         errorMessage += '• 頁面元素載入異常，請重新整理頁面後再試'
@@ -215,6 +239,9 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       
       alert(errorMessage)
       setShowPDFPreview(false)
+      setIsGenerating(false)
+      setPdfProgress(0)
+      setCurrentStep('')
     }
   }
   const exportToPDF = async () => {
@@ -513,7 +540,12 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             position: 'relative'
           }}>
             <button 
-              onClick={() => setShowPDFPreview(false)}
+              onClick={() => {
+                setShowPDFPreview(false)
+                setIsGenerating(false)
+                setPdfProgress(0)
+                setCurrentStep('')
+              }}
               style={{
                 position: 'absolute',
                 top: '10px',
@@ -528,17 +560,67 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
                 fontSize: '16px',
                 zIndex: 10000
               }}
+              disabled={isGenerating}
             >
               ×
             </button>
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '15px',
-              color: '#666',
-              fontSize: '14px'
-            }}>
-              正在產生PDF報價書...
-            </div>
+            
+            {/* 進度條和狀態顯示 */}
+            {isGenerating && (
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '15px',
+                padding: '15px',
+                background: '#f5f5f5',
+                borderRadius: '8px',
+                border: '1px solid #ddd'
+              }}>
+                <div style={{
+                  fontSize: '14px',
+                  color: '#333',
+                  marginBottom: '10px',
+                  fontWeight: '500'
+                }}>
+                  {currentStep}
+                </div>
+                
+                {/* 進度條 */}
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: '#e0e0e0',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  marginBottom: '8px'
+                }}>
+                  <div style={{
+                    width: `${pdfProgress}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #4caf50, #66bb6a)',
+                    borderRadius: '4px',
+                    transition: 'width 0.3s ease'
+                  }}></div>
+                </div>
+                
+                <div style={{
+                  fontSize: '12px',
+                  color: '#666'
+                }}>
+                  {pdfProgress}% 完成
+                </div>
+              </div>
+            )}
+            
+            {!isGenerating && (
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '15px',
+                color: '#666',
+                fontSize: '14px'
+              }}>
+                PDF預覽
+              </div>
+            )}
             <PDFQuote 
               companyInfo={companyInfo}
               serviceDetails={serviceDetails}
