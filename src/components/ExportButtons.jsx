@@ -3,6 +3,7 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
 import PDFQuote from './PDFQuote'
+import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const [showPDFPreview, setShowPDFPreview] = useState(false)
@@ -23,8 +24,8 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     const hasOnSite = features.includes('到場') || features.includes('現場') || features.includes('維修')
     
     // 計算停機損失 vs 服務成本比
-    const hourlyRevenue = annualRevenueNT / 365 / 24
-    const breakEvenHours = servicePrice / hourlyRevenue
+    const hourlyRevenue = calculateRevenue.hourly(companyInfo.annualRevenue)
+    const breakEvenHours = calculateRevenue.breakEvenHours(servicePrice, companyInfo.annualRevenue)
     
     // 根據班別和服務特性評估
     let level, recommendation, color, items = []
@@ -115,22 +116,36 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
 
   const exportPDFQuote = async () => {
     try {
-      // 顯示PDF預覽
-      setShowPDFPreview(true)
-      
-      // 等待DOM更新
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      const element = document.getElementById('pdf-quote-container')
-      if (!element) {
-        alert('PDF預覽載入失敗，請稍後再試')
-        setShowPDFPreview(false)
+      // 驗證必要資料
+      if (!companyInfo.companyName.trim()) {
+        alert('請先填寫公司名稱')
         return
       }
       
-      // 使用標準的PDF分頁方法
+      // 顯示PDF預覽
+      setShowPDFPreview(true)
+      
+      // 動態等待DOM更新完成
+      await new Promise(resolve => {
+        const checkElement = () => {
+          const element = document.getElementById('pdf-quote-container')
+          if (element && element.offsetHeight > 0) {
+            setTimeout(resolve, 200) // 額外等待渲染完成
+          } else {
+            setTimeout(checkElement, 50)
+          }
+        }
+        checkElement()
+      })
+      
+      const element = document.getElementById('pdf-quote-container')
+      if (!element) {
+        throw new Error('PDF容器元素未找到')
+      }
+      
+      // 優化的PDF生成設定
       const canvas = await html2canvas(element, {
-        scale: 1.5,
+        scale: window.devicePixelRatio || 2, // 響應式縮放
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -138,10 +153,22 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         height: element.scrollHeight,
         logging: false,
         removeContainer: true,
-        imageTimeout: 15000
+        imageTimeout: 30000, // 增加超時時間
+        onclone: (clonedDoc) => {
+          // 確保克隆文檔中的樣式正確
+          const clonedElement = clonedDoc.getElementById('pdf-quote-container')
+          if (clonedElement) {
+            clonedElement.style.visibility = 'visible'
+            clonedElement.style.position = 'static'
+          }
+        }
       })
 
-      const imgData = canvas.toDataURL('image/png', 0.92)
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error('PDF內容生成失敗，請檢查數據完整性')
+      }
+
+      const imgData = canvas.toDataURL('image/png', 0.95) // 提高圖片品質
       const pdf = new jsPDF('p', 'mm', 'a4')
       
       const imgWidth = 210 // A4寬度(mm)
@@ -162,14 +189,31 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         heightLeft -= pageHeight
       }
 
-      const fileName = `${companyInfo.companyName}_WISE-IoT_SRP維運服務報價書_${companyInfo.quoteDate.replace(/\//g, '')}.pdf`
+      // 安全的檔名生成
+      const safeCompanyName = companyInfo.companyName.replace(/[<>:"/\\|?*]/g, '_').trim()
+      const safeDate = companyInfo.quoteDate.replace(/\//g, '')
+      const fileName = `${safeCompanyName}_WISE-IoT_SRP維運服務報價書_${safeDate}.pdf`
+      
       pdf.save(fileName)
       
       // 隱藏PDF預覽
       setShowPDFPreview(false)
     } catch (error) {
       console.error('PDF報價書匯出失敗:', error)
-      alert('PDF報價書匯出失敗，請稍後再試')
+      
+      // 詳細的錯誤訊息
+      let errorMessage = 'PDF報價書匯出失敗：\n'
+      if (error.message.includes('容器元素')) {
+        errorMessage += '• 頁面元素載入異常，請重新整理頁面後再試'
+      } else if (error.message.includes('生成失敗')) {
+        errorMessage += '• 內容渲染失敗，請檢查所有必要資料是否已填寫完整'
+      } else if (error.name === 'NetworkError') {
+        errorMessage += '• 網路連線問題，請檢查網路狀態後再試'
+      } else {
+        errorMessage += '• 系統暫時無法處理請求，請稍後再試\n• 如問題持續發生，請聯繫技術支援'
+      }
+      
+      alert(errorMessage)
       setShowPDFPreview(false)
     }
   }
@@ -214,6 +258,11 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
 
   const exportToExcel = () => {
     try {
+      // 驗證必要資料
+      if (!companyInfo.companyName.trim()) {
+        alert('請先填寫公司名稱')
+        return
+      }
       const workbook = XLSX.utils.book_new()
       
       // 第一個工作表：公司資訊
@@ -289,13 +338,13 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
       serviceComparisonData.push(['年度價格 (新台幣)', '', '', ''])
       serviceComparisonData.push(['平台與應用層', `NT$ ${serviceDetails.platform.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.platform.premium.price.toLocaleString()}`])
       serviceComparisonData.push(['硬體基礎層', `NT$ ${serviceDetails.hardware.basic.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.advanced.price.toLocaleString()}`, `NT$ ${serviceDetails.hardware.premium.price.toLocaleString()}`])
-      serviceComparisonData.push(['組合總價', `NT$ ${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}`, `NT$ ${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}`])
+      serviceComparisonData.push(['組合總價', `NT$ ${getCombinedPrice(serviceDetails, 'basic', 'basic').toLocaleString()}`, `NT$ ${getCombinedPrice(serviceDetails, 'advanced', 'advanced').toLocaleString()}`, `NT$ ${getCombinedPrice(serviceDetails, 'premium', 'premium').toLocaleString()}`])
       const serviceComparisonWS = XLSX.utils.aoa_to_sheet(serviceComparisonData)
       XLSX.utils.book_append_sheet(workbook, serviceComparisonWS, '服務功能對照表')
 
       // 第三個工作表：成本效益分析
       const annualRevenueNT = companyInfo.annualRevenue * 10000
-      const hourlyRevenue = Math.floor(annualRevenueNT / 365 / 24)
+      const hourlyRevenue = calculateRevenue.hourly(companyInfo.annualRevenue)
       
       const costBenefitData = [
         ['成本效益分析'],
@@ -311,15 +360,15 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['8小時停機損失', `${(hourlyRevenue * 8).toLocaleString()}元`],
         [''],
         ['投資回報分析', ''],
-        ['Basic方案年成本', `${(serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price).toLocaleString()}元`],
-        ['Basic方案回本時間', `${((serviceDetails.platform.basic.price + serviceDetails.hardware.basic.price) / hourlyRevenue).toFixed(1)}小時停機`],
+        ['Basic方案年成本', `${getCombinedPrice(serviceDetails, 'basic', 'basic').toLocaleString()}元`],
+        ['Basic方案回本時間', `${calculateRevenue.breakEvenHours(getCombinedPrice(serviceDetails, 'basic', 'basic'), companyInfo.annualRevenue)}小時停機`],
         [''],
-        ['Advanced方案年成本', `${(serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price).toLocaleString()}元`],
-        ['Advanced方案回本時間', `${((serviceDetails.platform.advanced.price + serviceDetails.hardware.advanced.price) / hourlyRevenue).toFixed(1)}小時停機`],
+        ['Advanced方案年成本', `${getCombinedPrice(serviceDetails, 'advanced', 'advanced').toLocaleString()}元`],
+        ['Advanced方案回本時間', `${calculateRevenue.breakEvenHours(getCombinedPrice(serviceDetails, 'advanced', 'advanced'), companyInfo.annualRevenue)}小時停機`],
         [''],
-        ['Premium方案年成本', `${(serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price).toLocaleString()}元`],
-        ['Premium方案回本時間', `${((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / hourlyRevenue).toFixed(1)}小時停機`],
-        ['Premium成本占營業額比例', `${(((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / annualRevenueNT) * 100).toFixed(3)}%`]
+        ['Premium方案年成本', `${getCombinedPrice(serviceDetails, 'premium', 'premium').toLocaleString()}元`],
+        ['Premium方案回本時間', `${calculateRevenue.breakEvenHours(getCombinedPrice(serviceDetails, 'premium', 'premium'), companyInfo.annualRevenue)}小時停機`],
+        ['Premium成本占營業額比例', `${(((getCombinedPrice(serviceDetails, 'premium', 'premium')) / annualRevenueNT) * 100).toFixed(3)}%`]
       ]
       const costBenefitWS = XLSX.utils.aoa_to_sheet(costBenefitData)
       XLSX.utils.book_append_sheet(workbook, costBenefitWS, '成本效益分析')
@@ -351,17 +400,31 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         ['最終建議', ''],
         ['推薦方案', `${recommendedPlan}組合`],
         ['建議理由', reason],
-        ['投資效益', `避免${((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / hourlyRevenue).toFixed(1)}小時停機即可回本`],
-        ['年度保障價值', `成本僅占營業額${(((serviceDetails.platform.premium.price + serviceDetails.hardware.premium.price) / annualRevenueNT) * 100).toFixed(3)}%，獲得全方位保障`]
+        ['投資效益', `避免${calculateRevenue.breakEvenHours(getCombinedPrice(serviceDetails, 'premium', 'premium'), companyInfo.annualRevenue)}小時停機即可回本`],
+        ['年度保障價值', `成本僅占營業額${(((getCombinedPrice(serviceDetails, 'premium', 'premium')) / annualRevenueNT) * 100).toFixed(3)}%，獲得全方位保障`]
       ]
       const recommendationWS = XLSX.utils.aoa_to_sheet(recommendationData)
       XLSX.utils.book_append_sheet(workbook, recommendationWS, '適用性建議')
 
-      const fileName = `${companyInfo.companyName}_維運服務報價書_${companyInfo.quoteDate.replace(/\//g, '')}.xlsx`
+      // 安全的檔名生成
+      const safeCompanyName = companyInfo.companyName.replace(/[<>:"/\\|?*]/g, '_').trim()
+      const safeDate = companyInfo.quoteDate.replace(/\//g, '')
+      const fileName = `${safeCompanyName}_維運服務報價書_${safeDate}.xlsx`
+      
       XLSX.writeFile(workbook, fileName)
     } catch (error) {
-      console.error('Excel export failed:', error)
-      alert('Excel匯出失敗，請稍後再試')
+      console.error('Excel匯出失敗:', error)
+      
+      let errorMessage = 'Excel匯出失敗：\n'
+      if (error.message.includes('write')) {
+        errorMessage += '• 檔案寫入失敗，請檢查瀏覽器下載權限'
+      } else if (error.message.includes('memory')) {
+        errorMessage += '• 記憶體不足，請關閉其他分頁後再試'
+      } else {
+        errorMessage += '• 系統暫時無法處理請求，請稍後再試'
+      }
+      
+      alert(errorMessage)
     }
   }
 

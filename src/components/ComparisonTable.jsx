@@ -1,24 +1,17 @@
 import React from 'react'
+import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
 const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const calculateDailyRevenue = () => {
-    return Math.floor(companyInfo.annualRevenue * 10000 / 365 / 10000)
+    return calculateRevenue.daily(companyInfo.annualRevenue)
   }
 
   const calculateHourlyRevenue = () => {
-    return Math.floor(companyInfo.annualRevenue * 10000 / 365 / 24 / 10000)
+    return calculateRevenue.hourly(companyInfo.annualRevenue)
   }
 
-  const formatPrice = (price) => {
-    return `NT$ ${price.toLocaleString()}`
-  }
-
-  const getCombinedPrice = (platformType, hardwareType) => {
-    const platformPrice = serviceDetails.platform[platformType].enabled ? 
-      serviceDetails.platform[platformType].price : 0
-    const hardwarePrice = serviceDetails.hardware[hardwareType].enabled ? 
-      serviceDetails.hardware[hardwareType].price : 0
-    return platformPrice + hardwarePrice
+  const getCombinedPriceLocal = (platformType, hardwareType) => {
+    return getCombinedPrice(serviceDetails, platformType, hardwareType)
   }
 
   // 動態生成服務功能對照表
@@ -268,9 +261,9 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </tr>
             <tr style={{background: '#fff3e0', fontWeight: 'bold'}}>
               <td>組合總價</td>
-              <td style={{textAlign: 'center', fontSize: '18px', color: '#d32f2f'}}>{formatPrice(getCombinedPrice('basic', 'basic'))}</td>
-              <td style={{textAlign: 'center', fontSize: '18px', color: '#f57c00'}}>{formatPrice(getCombinedPrice('advanced', 'advanced'))}</td>
-              <td style={{textAlign: 'center', fontSize: '18px', color: '#2e7d32'}}>{formatPrice(getCombinedPrice('premium', 'premium'))}</td>
+              <td style={{textAlign: 'center', fontSize: '18px', color: '#d32f2f'}}>{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</td>
+              <td style={{textAlign: 'center', fontSize: '18px', color: '#f57c00'}}>{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</td>
+              <td style={{textAlign: 'center', fontSize: '18px', color: '#2e7d32'}}>{formatPrice(getCombinedPriceLocal('premium', 'premium'))}</td>
             </tr>
           </tbody>
         </table>
@@ -393,9 +386,9 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             boxShadow: '0 2px 8px rgba(244, 67, 54, 0.1)'
           }}>
             <h4 style={{margin: '0 0 12px 0', color: '#f44336', fontWeight: '600'}}>Basic MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('basic', 'basic'))}</p>
+            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</p>
             <p style={{color: '#f44336', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>❌ 高風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPrice('premium', 'premium') - getCombinedPrice('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({((getCombinedPrice('premium', 'premium') - getCombinedPrice('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / calculateHourlyRevenue()).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
           </div>
 
           {/* Advanced方案 */}
@@ -407,9 +400,9 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             boxShadow: '0 2px 8px rgba(255, 152, 0, 0.1)'
           }}>
             <h4 style={{margin: '0 0 12px 0', color: '#ff9800', fontWeight: '600'}}>Advanced MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('advanced', 'advanced'))}</p>
+            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</p>
             <p style={{color: '#ff9800', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>⚠️ 中等風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPrice('premium', 'premium') - getCombinedPrice('advanced', 'advanced')) / (calculateHourlyRevenue() * 10000) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced')) / calculateHourlyRevenue() + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
           </div>
 
           {/* Premium方案 */}
@@ -421,9 +414,9 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)'
           }}>
             <h4 style={{margin: '0 0 12px 0', color: '#4caf50', fontWeight: '600'}}>Premium MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPrice('premium', 'premium'))}</p>
+            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('premium', 'premium'))}</p>
             <p style={{color: '#4caf50', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>✅ 最佳投資</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>7*24支援，最適合連續性要求。成本僅佔年營業額{(((getCombinedPrice('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%，ROI極高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>7*24支援，最適合連續性要求。成本僅佔年營業額{(((getCombinedPriceLocal('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%，ROI極高。</p>
           </div>
         </div>
 
@@ -441,14 +434,14 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px'}}>
             <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
               <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>🎯 成本占比極低</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>維護成本占年營業額僅{((getCombinedPrice('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100).toFixed(3)}%</p>
-              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>相當於每天投資{Math.round(getCombinedPrice('premium', 'premium') / 365).toLocaleString()}元獲得全方位保障</p>
+              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>維護成本占年營業額僅{((getCombinedPriceLocal('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100).toFixed(3)}%</p>
+              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>相當於每天投資{Math.round(getCombinedPriceLocal('premium', 'premium') / 365).toLocaleString()}元獲得全方位保障</p>
             </div>
             
             <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
               <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>⚡ 回本速度極快</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{(getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本</p>
-              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPrice('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
+              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本</p>
+              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
             </div>
           </div>
         </div>
@@ -471,12 +464,12 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             fontSize: '18px',
             fontWeight: '600'
           }}>
-            <span style={{color: '#4caf50'}}>{(getCombinedPrice('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
+            <span style={{color: '#4caf50'}}>{(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
             <span style={{margin: '0 20px', color: '#666', fontSize: '24px'}}>&lt;</span>
-            <span style={{color: '#f44336'}}>{((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000)) ).toFixed(1)}小時停機損失({(getCombinedPrice('premium', 'premium') / 10000).toFixed(1)}萬)</span>
+            <span style={{color: '#f44336'}}>{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
           </div>
           <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
-            避免{((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000))).toFixed(1)}小時停機即可回本
+            避免{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本
           </div>
         </div>
 

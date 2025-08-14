@@ -1,29 +1,22 @@
 import React from 'react'
+import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
 const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
   const calculateDailyRevenue = () => {
-    return Math.floor(companyInfo.annualRevenue * 10000 / 365 / 10000)
+    return calculateRevenue.daily(companyInfo.annualRevenue)
   }
 
   const calculateHourlyRevenue = () => {
-    return Math.round(companyInfo.annualRevenue * 10000 / 365 / 24)
-  }
-
-  const formatPrice = (price) => {
-    return `NT$ ${price.toLocaleString()}`
-  }
-
-  const getCombinedPrice = (platformType, hardwareType) => {
-    const platformPrice = serviceDetails.platform[platformType].enabled ? 
-      serviceDetails.platform[platformType].price : 0
-    const hardwarePrice = serviceDetails.hardware[hardwareType].enabled ? 
-      serviceDetails.hardware[hardwareType].price : 0
-    return platformPrice + hardwarePrice
+    return calculateRevenue.hourly(companyInfo.annualRevenue)
   }
 
   const calculateDowntimeRisk = (hours) => {
     const riskMultiplier = shiftPatterns[companyInfo.shiftPattern].riskMultiplier || 1
-    return Math.round(calculateHourlyRevenue() * hours * riskMultiplier)
+    return calculateRevenue.downtimeRisk(companyInfo.annualRevenue, hours, riskMultiplier)
+  }
+
+  const getCombinedPriceLocal = (platformType, hardwareType) => {
+    return getCombinedPrice(serviceDetails, platformType, hardwareType)
   }
 
   // 動態生成服務功能對照表
@@ -298,13 +291,13 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <tr style={{ background: '#fff3e0' }}>
               <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>組合總價</td>
               <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#d32f2f' }}>
-                {formatPrice(getCombinedPrice('basic', 'basic'))}
+                {formatPrice(getCombinedPriceLocal('basic', 'basic'))}
               </td>
               <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#f57c00' }}>
-                {formatPrice(getCombinedPrice('advanced', 'advanced'))}
+                {formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}
               </td>
               <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#2e7d32' }}>
-                {formatPrice(getCombinedPrice('premium', 'premium'))}
+                {formatPrice(getCombinedPriceLocal('premium', 'premium'))}
               </td>
             </tr>
           </tbody>
@@ -495,11 +488,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <h4 style={{ margin: '0 0 8px 0', color: '#f44336', fontSize: '12px' }}>Basic MA 方案</h4>
             <div style={{ fontWeight: '600', marginBottom: '6px' }}>
-              年成本：{formatPrice(getCombinedPrice('basic', 'basic'))}
+              年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}
             </div>
             <div style={{ color: '#f44336', fontWeight: 'bold', marginBottom: '6px' }}>❌ 高風險</div>
             <div style={{ color: '#666', lineHeight: '1.3' }}>
-              一次{((getCombinedPrice('premium', 'premium') - getCombinedPrice('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失就超過與Premium的差額。
+              一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / calculateHourlyRevenue()).toFixed(1)}小時停機損失就超過與Premium的差額。
             </div>
           </div>
 
@@ -510,7 +503,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <h4 style={{ margin: '0 0 8px 0', color: '#ff9800', fontSize: '12px' }}>Advanced MA 方案</h4>
             <div style={{ fontWeight: '600', marginBottom: '6px' }}>
-              年成本：{formatPrice(getCombinedPrice('advanced', 'advanced'))}
+              年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}
             </div>
             <div style={{ color: '#ff9800', fontWeight: 'bold', marginBottom: '6px' }}>⚠️ 中等風險</div>
             <div style={{ color: '#666', lineHeight: '1.3' }}>
@@ -525,11 +518,11 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <h4 style={{ margin: '0 0 8px 0', color: '#4caf50', fontSize: '12px' }}>Premium MA 方案</h4>
             <div style={{ fontWeight: '600', marginBottom: '6px' }}>
-              年成本：{formatPrice(getCombinedPrice('premium', 'premium'))}
+              年成本：{formatPrice(getCombinedPriceLocal('premium', 'premium'))}
             </div>
             <div style={{ color: '#4caf50', fontWeight: 'bold', marginBottom: '6px' }}>✅ 最佳投資</div>
             <div style={{ color: '#666', lineHeight: '1.3' }}>
-              7*24支援，成本僅佔年營業額{(((getCombinedPrice('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%。
+              7*24支援，成本僅佔年營業額{(((getCombinedPriceLocal('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%。
             </div>
           </div>
         </div>
@@ -559,10 +552,10 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           <div>
             <h4 style={{ color: '#4caf50', margin: '0 0 8px 0', fontSize: '12px' }}>🎯 成本效益分析</h4>
             <div style={{ margin: '4px 0' }}>
-              • 避免{((getCombinedPrice('premium', 'premium') / (calculateHourlyRevenue() * 10000))).toFixed(1)}小時停機即可回本
+              • 避免{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本
             </div>
             <div style={{ margin: '4px 0' }}>
-              • 每日投資僅{Math.round(getCombinedPrice('premium', 'premium') / 365).toLocaleString()}元
+              • 每日投資僅{Math.round(getCombinedPriceLocal('premium', 'premium') / 365).toLocaleString()}元
             </div>
             <div style={{ margin: '4px 0' }}>
               • 全年保障價值遠超投資成本

@@ -107,3 +107,42 @@ export const formatCompanyInfo = (rawData) => {
     establishDate: rawData.establishDate?.trim() || ''
   }
 }
+
+// 共用計算函數 - 統一所有組件的計算邏輯
+export const calculateRevenue = {
+  // 計算日營業額（萬元）
+  daily: (annualRevenueWan) => {
+    return Math.round(annualRevenueWan * 10000 / 365 / 10000)
+  },
+  
+  // 計算時營業額（元）
+  hourly: (annualRevenueWan) => {
+    return Math.round(annualRevenueWan * 10000 / 365 / 24)
+  },
+  
+  // 計算停機風險成本（含風險係數）
+  downtimeRisk: (annualRevenueWan, hours, riskMultiplier = 1) => {
+    const hourlyRevenue = Math.round(annualRevenueWan * 10000 / 365 / 24)
+    return Math.round(hourlyRevenue * hours * riskMultiplier)
+  },
+  
+  // 計算投資回本時間（小時）
+  breakEvenHours: (serviceCost, annualRevenueWan) => {
+    const hourlyRevenue = Math.round(annualRevenueWan * 10000 / 365 / 24)
+    return parseFloat((serviceCost / hourlyRevenue).toFixed(1))
+  }
+}
+
+// 價格格式化
+export const formatPrice = (price) => {
+  return `NT$ ${price.toLocaleString()}`
+}
+
+// 組合服務價格計算
+export const getCombinedPrice = (serviceDetails, platformType, hardwareType) => {
+  const platformPrice = serviceDetails.platform[platformType].enabled ? 
+    serviceDetails.platform[platformType].price : 0
+  const hardwarePrice = serviceDetails.hardware[hardwareType].enabled ? 
+    serviceDetails.hardware[hardwareType].price : 0
+  return platformPrice + hardwarePrice
+}
