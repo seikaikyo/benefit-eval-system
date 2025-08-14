@@ -239,6 +239,12 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </table>
       </div>
 
+      {/* 分頁控制點 - 確保硬體基礎層從新頁開始 */}
+      <div style={{ 
+        pageBreakBefore: 'always',
+        height: '1px'
+      }}></div>
+
       {/* 硬體基礎層服務對照表 */}
       <div style={{ 
         marginBottom: '20px',
@@ -411,9 +417,9 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </table>
       </div>
 
-      {/* 分頁控制點 */}
+      {/* 分頁控制點 - 確保班別風險分析從第三頁開始 */}
       <div style={{ 
-        pageBreakBefore: 'auto',
+        pageBreakBefore: 'always',
         height: '1px',
         marginBottom: '0px'
       }}></div>
@@ -462,7 +468,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <div>
               <div style={{ fontSize: '12px', color: '#666', marginBottom: '5px' }}>時營業額</div>
               <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4caf50' }}>
-                {(calculateHourlyRevenue() / 10000).toFixed(1)}萬
+                {calculateHourlyRevenue()}萬
               </div>
             </div>
           </div>
@@ -502,7 +508,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <div style={{ fontWeight: 'bold', color: '#f57c00', marginBottom: '5px' }}>2小時停機</div>
             <div style={{ marginBottom: '3px' }}>
-              基本損失：{(calculateHourlyRevenue() * 2 / 10000).toFixed(1)}萬
+              基本損失：{(calculateHourlyRevenue() * 2).toFixed(1)}萬
             </div>
             <div style={{ marginBottom: '3px' }}>
               風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}
@@ -520,7 +526,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <div style={{ fontWeight: 'bold', color: '#d32f2f', marginBottom: '5px' }}>4小時停機</div>
             <div style={{ marginBottom: '3px' }}>
-              基本損失：{(calculateHourlyRevenue() * 4 / 10000).toFixed(1)}萬
+              基本損失：{(calculateHourlyRevenue() * 4).toFixed(1)}萬
             </div>
             <div style={{ marginBottom: '3px' }}>
               風險調整：× {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}
@@ -532,12 +538,6 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
         </div>
       </div>
 
-      {/* 分頁控制點 */}
-      <div style={{ 
-        pageBreakBefore: 'auto',
-        height: '1px',
-        marginBottom: '0px'
-      }}></div>
 
       {/* 成本效益分析 */}
       <div style={{ 
@@ -613,7 +613,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             </div>
             <div style={{ color: '#f44336', fontWeight: 'bold', marginBottom: '6px' }}>❌ 高風險</div>
             <div style={{ color: '#666', lineHeight: '1.3' }}>
-              一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / calculateHourlyRevenue()).toFixed(1)}小時停機損失就超過與Premium的差額。
+              一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失就超過與Premium的差額。
             </div>
           </div>
 
@@ -673,7 +673,7 @@ const PDFQuote = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           <div>
             <h4 style={{ color: '#4caf50', margin: '0 0 8px 0', fontSize: '12px' }}>🎯 成本效益分析</h4>
             <div style={{ margin: '4px 0' }}>
-              • 避免{(getCombinedPriceLocal('premium', 'premium') / calculateHourlyRevenue()).toFixed(1)}小時停機即可回本
+              • 避免{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本
             </div>
             <div style={{ margin: '4px 0' }}>
               • 每日投資僅{Math.round(getCombinedPriceLocal('premium', 'premium') / 365).toLocaleString()}元
