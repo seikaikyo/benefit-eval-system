@@ -78,8 +78,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     const hasOnSite = features.includes('到場') || features.includes('現場') || features.includes('維修')
     
     // 計算停機損失 vs 服務成本比
-    const hourlyRevenue = annualRevenueNT / 365 / 24
-    const breakEvenHours = servicePrice / hourlyRevenue // 多少小時停機損失等於服務費用
+    const breakEvenHours = calculateRevenue.breakEvenHours(servicePrice, companyInfo.annualRevenue) // 多少小時停機損失等於服務費用
     
     // 根據班別和服務特性評估
     let level, recommendation, color, items = []
@@ -343,28 +342,28 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ffc107', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>2小時停機</p>
               <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>
-                損失{Math.round(calculateHourlyRevenue() * 2 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+                損失{calculateRevenue.downtimeRisk(companyInfo.annualRevenue, 2, shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 2}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
+                基本損失{(calculateHourlyRevenue() * 2).toFixed(1)}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ff9800', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>4小時停機</p>
               <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>
-                損失{Math.round(calculateHourlyRevenue() * 4 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+                損失{calculateRevenue.downtimeRisk(companyInfo.annualRevenue, 4, shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 4}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
+                基本損失{(calculateHourlyRevenue() * 4).toFixed(1)}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #f44336', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>8小時停機</p>
               <p style={{margin: '0', fontSize: '20px', color: '#f44336', fontWeight: 'bold'}}>
-                損失{Math.round(calculateHourlyRevenue() * 8 * shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
+                損失{calculateRevenue.downtimeRisk(companyInfo.annualRevenue, 8, shiftPatterns[companyInfo.shiftPattern].riskMultiplier)}萬
               </p>
               <p style={{margin: '5px 0 0 0', fontSize: '12px', color: '#999'}}>
-                基本損失{calculateHourlyRevenue() * 8}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
+                基本損失{(calculateHourlyRevenue() * 8).toFixed(1)}萬 × {(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x風險係數
               </p>
             </div>
           </div>
@@ -388,7 +387,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#f44336', fontWeight: '600'}}>Basic MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</p>
             <p style={{color: '#f44336', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>❌ 高風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic'), companyInfo.annualRevenue).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
           </div>
 
           {/* Advanced方案 */}
@@ -402,7 +401,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             <h4 style={{margin: '0 0 12px 0', color: '#ff9800', fontWeight: '600'}}>Advanced MA 方案</h4>
             <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</p>
             <p style={{color: '#ff9800', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>⚠️ 中等風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced')) / (calculateHourlyRevenue() * 10000) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
+            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{(calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced'), companyInfo.annualRevenue) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
           </div>
 
           {/* Premium方案 */}
@@ -440,7 +439,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
             
             <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
               <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>⚡ 回本速度極快</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本</p>
+              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機即可回本</p>
               <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
             </div>
           </div>
@@ -466,10 +465,10 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           }}>
             <span style={{color: '#4caf50'}}>{(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
             <span style={{margin: '0 20px', color: '#666', fontSize: '24px'}}>&lt;</span>
-            <span style={{color: '#f44336'}}>{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
+            <span style={{color: '#f44336'}}>{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
           </div>
           <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
-            避免{(getCombinedPriceLocal('premium', 'premium') / (calculateHourlyRevenue() * 10000)).toFixed(1)}小時停機即可回本
+            避免{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機即可回本
           </div>
         </div>
 
