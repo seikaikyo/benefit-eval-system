@@ -184,7 +184,7 @@ function App() {
         boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
         border: '1px solid rgba(255,255,255,0.2)'
       }}>
-        V2.1.1
+        V2.1.2
       </div>
       
       <div className="main-layout">
