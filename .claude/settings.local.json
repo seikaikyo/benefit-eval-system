@@ -33,7 +33,8 @@
       "WebFetch(domain:opendata.vip)",
       "WebFetch(domain:benefit-eval-system.vercel.app)",
       "Bash(touch:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": []
   }

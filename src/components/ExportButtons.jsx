@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import * as XLSX from 'xlsx'
-import { pdf } from '@react-pdf/renderer'
 import PDFQuote from './PDFQuote'
-import ReactPDFQuoteSimple from './ReactPDFQuoteSimple'
 import { calculateRevenue, formatPrice, getCombinedPrice } from '../utils/taxIdService'
 
 const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
@@ -247,64 +245,6 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
     }
   }
 
-  // 新的react-pdf匯出函數
-  const exportToReactPDF = async () => {
-    try {
-      setIsGenerating(true)
-      setPdfProgress(20)
-      setCurrentStep('正在生成React PDF文件...')
-
-      // 生成PDF文檔
-      const doc = <ReactPDFQuoteSimple 
-        companyInfo={companyInfo} 
-        serviceDetails={serviceDetails} 
-        shiftPatterns={shiftPatterns} 
-      />
-      
-      setPdfProgress(60)
-      setCurrentStep('正在渲染PDF內容...')
-      
-      // 渲染為blob
-      const asPdf = pdf(doc)
-      const blob = await asPdf.toBlob()
-      
-      setPdfProgress(90)
-      setCurrentStep('正在準備下載...')
-      
-      // 創建下載鏈接
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      
-      // 生成安全的檔案名稱
-      const safeName = companyInfo.companyName.replace(/[^\w\s-]/g, '').trim() || '公司'
-      const timestamp = new Date().toISOString().slice(0, 10)
-      link.download = `${safeName}_WISE-IoT SRP維護服務報價_${timestamp}.pdf`
-      
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-      URL.revokeObjectURL(url)
-      
-      setPdfProgress(100)
-      setCurrentStep('PDF匯出完成！')
-      
-      setTimeout(() => {
-        setIsGenerating(false)
-        setPdfProgress(0)
-        setCurrentStep('')
-      }, 1000)
-      
-    } catch (error) {
-      console.error('React PDF匯出失敗:', error)
-      alert('PDF匯出失敗，請稍後再試。錯誤訊息：' + error.message)
-      setIsGenerating(false)
-      setPdfProgress(0)
-      setCurrentStep('')
-    }
-  }
-
   const exportToPDF = async () => {
     try {
       const element = document.getElementById('comparison-table-container')
@@ -539,28 +479,7 @@ const ExportButtons = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               transition: 'all 0.3s ease'
             }}
           >
-            📄 匯出 PDF 報價書 (HTML)
-          </button>
-
-          <button 
-            className="export-btn pdf-btn" 
-            onClick={exportToReactPDF}
-            title="匯出高品質向量PDF報價書 (推薦)"
-            style={{
-              background: 'linear-gradient(135deg, #1976d2, #1565c0)',
-              color: 'white',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              marginRight: '15px',
-              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            🚀 匯出 PDF 報價書 (React)
+            📄 匯出 PDF 報價書
           </button>
           
           <button 
