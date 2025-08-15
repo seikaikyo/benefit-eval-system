@@ -419,31 +419,102 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           </div>
         </div>
 
-        {/* Premium方案詳細優勢 */}
-        <div style={{
-          border: '2px solid #4caf50',
-          borderRadius: '10px',
-          padding: '25px',
-          background: 'white',
-          marginBottom: '25px',
-          boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)'
-        }}>
-          <h4 style={{margin: '0 0 20px 0', color: '#4caf50', textAlign: 'center', fontWeight: '600'}}>🌟 Premium方案：最明智的投資決策</h4>
+        {/* 智慧方案推薦系統 */}
+        {(() => {
+          // 營業額區間判斷
+          const revenue = companyInfo.annualRevenue
+          let recommendedPlan = ''
+          let planColor = ''
+          let planIcon = ''
+          let analysisContent = null
           
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px'}}>
-            <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
-              <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>🎯 成本占比極低</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>維護成本占年營業額僅{((getCombinedPriceLocal('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100).toFixed(3)}%</p>
-              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>相當於每天投資{Math.round(getCombinedPriceLocal('premium', 'premium') / 365).toLocaleString()}元獲得全方位保障</p>
+          if (revenue < 2000) {
+            recommendedPlan = 'Basic方案最適合'
+            planColor = '#2196f3'
+            planIcon = '💙'
+            analysisContent = {
+              title: '小型企業推薦：Basic方案',
+              reason: '營業額較小，基礎保障已足夠',
+              benefits: [
+                `年維護成本僅${(getCombinedPriceLocal('basic', 'basic') / 10000).toFixed(1)}萬，佔營業額${((getCombinedPriceLocal('basic', 'basic') / (revenue * 10000)) * 100).toFixed(2)}%`,
+                `避免${Math.ceil(calculateRevenue.breakEvenHours(getCombinedPriceLocal('basic', 'basic'), revenue) / 24)}天停機即可回本`,
+                '基礎遠端支援已能處理大部分問題'
+              ]
+            }
+          } else if (revenue < 5000) {
+            recommendedPlan = 'Advanced方案最適合'
+            planColor = '#ff9800'
+            planIcon = '🧡'
+            analysisContent = {
+              title: '中型企業推薦：Advanced方案',
+              reason: '營業額中等，需要更好的預防維護',
+              benefits: [
+                `年維護成本${(getCombinedPriceLocal('advanced', 'advanced') / 10000).toFixed(1)}萬，佔營業額${((getCombinedPriceLocal('advanced', 'advanced') / (revenue * 10000)) * 100).toFixed(2)}%`,
+                `避免${Math.ceil(calculateRevenue.breakEvenHours(getCombinedPriceLocal('advanced', 'advanced'), revenue) / 24)}天停機即可回本`,
+                '包含預防性巡檢，大幅降低故障風險'
+              ]
+            }
+          } else {
+            recommendedPlan = 'Premium方案最適合'
+            planColor = '#4caf50'
+            planIcon = '💚'
+            analysisContent = {
+              title: '大型企業推薦：Premium方案',
+              reason: '營業額龐大，停機損失巨大，需要最高等級保障',
+              benefits: [
+                `年維護成本${(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬，佔營業額僅${((getCombinedPriceLocal('premium', 'premium') / (revenue * 10000)) * 100).toFixed(3)}%`,
+                `避免${Math.ceil(calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), revenue) / 24)}天停機即可回本`,
+                '7*24全時段支援，專家諮詢服務'
+              ]
+            }
+          }
+          
+          return (
+            <div style={{
+              border: `2px solid ${planColor}`,
+              borderRadius: '10px',
+              padding: '25px',
+              background: 'white',
+              marginBottom: '25px',
+              boxShadow: `0 2px 8px ${planColor}20`
+            }}>
+              <h4 style={{
+                margin: '0 0 20px 0', 
+                color: planColor, 
+                textAlign: 'center', 
+                fontWeight: '600'
+              }}>
+                {planIcon} {analysisContent.title}
+              </h4>
+              
+              <div style={{
+                background: `${planColor}10`,
+                border: `1px solid ${planColor}30`,
+                borderRadius: '8px',
+                padding: '15px',
+                marginBottom: '20px',
+                textAlign: 'center'
+              }}>
+                <p style={{margin: '0', color: planColor, fontWeight: '600'}}>
+                  🎯 智慧推薦理由：{analysisContent.reason}
+                </p>
+              </div>
+              
+              <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '15px'}}>
+                {analysisContent.benefits.map((benefit, index) => (
+                  <div key={index} style={{
+                    padding: '12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    background: '#fafafa'
+                  }}>
+                    <p style={{margin: '0', fontSize: '14px', color: '#666'}}>✓ {benefit}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            
-            <div style={{padding: '15px', border: '1px solid #e0e0e0', borderRadius: '8px'}}>
-              <h5 style={{color: '#4caf50', margin: '0 0 12px 0', fontWeight: '600'}}>⚡ 回本速度極快</h5>
-              <p style={{margin: '0', fontSize: '14px', color: '#666'}}>避免一次{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機即可回本</p>
-              <p style={{margin: '8px 0', fontSize: '14px', color: '#666'}}>一年避免1天大停機超值{(24 * calculateHourlyRevenue() - getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(0)}萬效益</p>
-            </div>
-          </div>
-        </div>
+          )
+        })()}
 
         {/* 成本對比總結 - 智能計算 */}
         <div style={{

@@ -28,10 +28,8 @@ body {
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  overflow: hidden;
+  position: relative !important;
+  overflow-x: hidden;
 }
 
 /* CoreUI 左側邊欄 */
@@ -41,9 +39,15 @@ body {
   color: #ffffff;
   overflow-y: auto;
   flex-shrink: 0;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   border-right: 1px solid #d8dbe0;
   box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+  transition: width 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 /* 左側邊欄導航文字和圖標顏色 */
@@ -81,6 +85,7 @@ body {
   padding: 0 1rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: #263447;
   border-bottom: 1px solid #404c63;
 }
@@ -101,6 +106,91 @@ body {
   display: block;
   margin-top: 2px;
   color: #8a9ba8;
+}
+
+/* 側邊欄折疊按鈕 */
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 側邊欄折疊狀態 */
+.sidebar-collapsed .admin-sidebar {
+  width: 60px;
+}
+
+.sidebar-collapsed .admin-main {
+  margin-left: 60px !important;
+}
+
+.sidebar-collapsed .admin-logo h1 {
+  display: none;
+}
+
+.sidebar-collapsed .admin-logo span {
+  display: none;
+}
+
+/* 折疊狀態下的導航樣式 */
+.sidebar-collapsed .sidebar-nav .nav-title {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-nav .nav-link {
+  justify-content: center !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  text-align: center !important;
+}
+
+.sidebar-collapsed .sidebar-nav .nav-link .nav-icon {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.sidebar-collapsed .sidebar-nav .nav-link span:not(.nav-icon) {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-nav .nav-group {
+  display: none !important;
+}
+
+/* 確保CoreUI導航項目文字隱藏 */
+.sidebar-collapsed .c-sidebar-nav .c-nav-link,
+.sidebar-collapsed .c-sidebar-nav .c-nav-title,
+.sidebar-collapsed .c-sidebar-nav .c-nav-group {
+  text-indent: -9999px !important;
+}
+
+.sidebar-collapsed .c-sidebar-nav .nav-icon {
+  text-indent: 0 !important;
+}
+
+/* UserGuide 折疊狀態樣式 */
+.sidebar-collapsed .sidebar-nav .nav-item {
+  text-align: center !important;
+  padding: 0.5rem 0 !important;
+}
+
+.sidebar-collapsed .sidebar-nav .nav-item .nav-icon {
+  display: block !important;
+  margin: 0 auto !important;
+  font-size: 1.2rem !important;
+}
+
+.sidebar-collapsed .sidebar-nav {
+  padding: 0.5rem 0 !important;
 }
 
 /* CoreUI 版本標籤 */
@@ -126,11 +216,12 @@ body {
   background: #ebedef;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  height: 100vh;
-  width: calc(100vw - var(--cui-sidebar-width)) !important;
+  min-height: 100vh;
   max-width: none !important;
   margin: 0 !important;
+  margin-left: var(--cui-sidebar-width) !important;
   padding: 0 !important;
+  transition: margin-left 0.3s ease;
 }
 
 /* 移除舊的header相關樣式 */
@@ -233,21 +324,77 @@ body {
 
 /* 響應式設計 */
 @media (max-width: 1200px) {
-  .main-container {
-    margin-left: 60px; /* 收縮模式 */
+  .admin-layout:not(.sidebar-collapsed) {
+    --cui-sidebar-width: 60px;
+  }
+  
+  .admin-layout:not(.sidebar-collapsed) .admin-sidebar {
+    width: 60px;
+  }
+  
+  .admin-layout:not(.sidebar-collapsed) .admin-logo h1 {
+    display: none;
+  }
+  
+  .admin-layout:not(.sidebar-collapsed) .admin-logo span {
+    display: none;
+  }
+  
+  .admin-layout:not(.sidebar-collapsed) .sidebar-toggle-btn {
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 768px) {
+  .admin-layout {
+    display: block !important;
+    flex-direction: none !important;
+    position: relative;
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* 手機版完全隱藏側邊欄 */
+  .admin-sidebar {
+    display: none !important;
+    width: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+  
+  /* 手機版主內容區佔滿全屏 */
+  .admin-main {
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh;
+    overflow-y: auto;
+    flex: none !important;
+    position: relative !important;
+    left: 0 !important;
+  }
+  
+  .admin-content {
+    padding: 1rem;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
   .main-container {
-    margin-left: 0;
-    padding-left: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
   }
   
   .content-wrapper {
     padding: 15px 20px;
     gap: 20px;
     max-width: 100%;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
   }
 }
 
@@ -1173,14 +1320,14 @@ textarea {
   position: absolute;
   top: -8px;
   left: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.3);
   border: 1px solid rgba(255,255,255,0.2);
 }
 
@@ -1298,5 +1445,52 @@ textarea {
 @media (max-width: 768px) {
   .services-grid-horizontal {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Back to Top 按鈕樣式 */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1001;
+  opacity: 0.8;
+}
+
+.back-to-top-btn:hover {
+  opacity: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.back-to-top-btn:active {
+  transform: translateY(-1px);
+}
+
+/* 手機版Back to Top調整 */
+@media (max-width: 768px) {
+  .back-to-top-btn {
+    width: 45px !important;
+    height: 45px !important;
+  }
+  
+  .back-to-top-btn.visible {
+    display: flex !important;
+  }
+  
+  .back-to-top-btn.hidden {
+    display: none !important;
   }
 }

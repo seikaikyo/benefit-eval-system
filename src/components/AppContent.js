@@ -1,41 +1,10 @@
-import { useState, useEffect } from 'react'
-import '@coreui/coreui/dist/css/coreui.min.css'
-import './App.css'
-import ComparisonTable from './components/ComparisonTable'
-import ConfigPanel from './components/ConfigPanel'
-import ExportButtons from './components/ExportButtons'
-import UserGuide from './components/UserGuide'
-import BackToTop from './components/BackToTop'
-import Footer from './components/Footer'
-import { 
-  CButton, 
-  CSidebar, 
-  CSidebarBrand, 
-  CSidebarToggler,
-  CContainer,
-  CHeader,
-  CHeaderBrand,
-  CHeaderToggler
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilMoon, cilSun, cilMenu } from '@coreui/icons'
+import React, { useState } from 'react'
+import { CContainer } from '@coreui/react'
+import ComparisonTable from './ComparisonTable'
+import ConfigPanel from './ConfigPanel'
+import ExportButtons from './ExportButtons'
 
-function App() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mobileExpanded, setMobileExpanded] = useState(false)
-  
-  // 監聽螢幕尺寸變化，自動收縮手機版選單
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setMobileExpanded(false)
-      }
-    }
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-  
+const AppContent = () => {
   const [companyInfo, setCompanyInfo] = useState({
     companyName: '',
     address: '',
@@ -45,16 +14,16 @@ function App() {
     email: '',
     quoteDate: new Date().toISOString().slice(0, 10),
     validDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-    annualRevenue: 150000, // 改為萬元
+    annualRevenue: 150000,
     specialRequirements: '24小時四班二輪制生產環境',
-    shiftPattern: '24hours' // 新增班別模式
+    shiftPattern: '24hours'
   })
 
   const [shiftPatterns] = useState({
     '8hours': {
       name: '標準8小時單班制',
       workingHours: 8,
-      riskMultiplier: 0.3, // 風險係數較低
+      riskMultiplier: 0.3,
       description: '週一到週五，正常上班時間，適合辦公型業務'
     },
     '12hours': {
@@ -66,7 +35,7 @@ function App() {
     '24hours': {
       name: '24小時四班二輪制',
       workingHours: 24,
-      riskMultiplier: 1.0, // 風險係數最高
+      riskMultiplier: 1.0,
       description: '連續生產，系統停機影響重大'
     },
     'custom': {
@@ -204,85 +173,49 @@ function App() {
   })
 
   return (
-    <div className={`App admin-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <CContainer className="px-4" lg>
+      {/* 版本標籤 */}
+      <div className="version-badge">V2.1.7</div>
       
-      {/* 左側邊欄 */}
-      <div className={`admin-sidebar ${mobileExpanded ? 'mobile-expanded' : ''}`}>
-        <div className="admin-logo">
-          <h1>🏭 WISE-IoT SRP</h1>
-          <button 
-            className="sidebar-toggle-btn"
-            onClick={() => {
-              if (window.innerWidth <= 768) {
-                setMobileExpanded(!mobileExpanded)
-              } else {
-                setSidebarCollapsed(!sidebarCollapsed)
-              }
-            }}
-            aria-label="Toggle sidebar"
-          >
-            <CIcon icon={cilMenu} />
-          </button>
-        </div>
-        <UserGuide isCollapsed={sidebarCollapsed} />
+      {/* 配置面板模組 */}
+      <div className="admin-card mb-4">
+        <div className="module-label-right">配置模組 ConfigPanel</div>
+        <ConfigPanel 
+          companyInfo={companyInfo}
+          setCompanyInfo={setCompanyInfo}
+          serviceDetails={serviceDetails}
+          setServiceDetails={setServiceDetails}
+          shiftPatterns={shiftPatterns}
+        />
       </div>
       
-      {/* 右側主內容區域 */}
-      <div className="admin-main">
-        <div className="admin-content">
-          {/* 配置面板模組 */}
-          <div className="admin-card">
-            <div className="module-label-right">配置模組 ConfigPanel</div>
-            <ConfigPanel 
-              companyInfo={companyInfo}
-              setCompanyInfo={setCompanyInfo}
-              serviceDetails={serviceDetails}
-              setServiceDetails={setServiceDetails}
-              shiftPatterns={shiftPatterns}
-            />
-          </div>
-          
-          {/* PDF第一頁分頁點 */}
-          <div className="pdf-page-break page-1"></div>
-          
-          {/* 比較表模組 */}
-          <div className="admin-card">
-            <div className="module-label-right">分析模組 ComparisonTable</div>
-            <ComparisonTable 
-              companyInfo={companyInfo}
-              serviceDetails={serviceDetails}
-              shiftPatterns={shiftPatterns}
-            />
-          </div>
-          
-          {/* PDF第二頁分頁點 */}
-          <div className="pdf-page-break page-2"></div>
-          
-          {/* 匯出按鈕模組 */}
-          <div className="admin-card">
-            <div className="module-label-right">匯出模組 ExportButtons</div>
-            <ExportButtons 
-              companyInfo={companyInfo}
-              serviceDetails={serviceDetails}
-              shiftPatterns={shiftPatterns}
-            />
-          </div>
-          
-          {/* PDF第三頁分頁點 */}
-          <div className="pdf-page-break page-3"></div>
-          
-          {/* Footer 模組 */}
-          <div className="admin-card">
-            <div className="module-label-right">底部模組 Footer</div>
-            <Footer />
-          </div>
-        </div>
+      {/* PDF第一頁分頁點 */}
+      <div className="pdf-page-break page-1"></div>
+      
+      {/* 比較表模組 */}
+      <div className="admin-card mb-4">
+        <div className="module-label-right">分析模組 ComparisonTable</div>
+        <ComparisonTable 
+          companyInfo={companyInfo}
+          serviceDetails={serviceDetails}
+          shiftPatterns={shiftPatterns}
+        />
       </div>
       
-      {/* Back to Top 按鈕 */}
-      <BackToTop />
-    </div>
+      {/* PDF第二頁分頁點 */}
+      <div className="pdf-page-break page-2"></div>
+      
+      {/* 匯出按鈕模組 */}
+      <div className="admin-card mb-4">
+        <div className="module-label-right">匯出模組 ExportButtons</div>
+        <ExportButtons 
+          companyInfo={companyInfo}
+          serviceDetails={serviceDetails}
+          shiftPatterns={shiftPatterns}
+        />
+      </div>
+    </CContainer>
   )
 }
 
-export default App
+export default React.memo(AppContent)

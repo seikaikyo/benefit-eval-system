@@ -17,7 +17,7 @@ import {
   cilSpeedometer
 } from '@coreui/icons'
 
-const UserGuide = () => {
+const UserGuide = ({ isCollapsed = false }) => {
   
   // 導航錨點配置 - 使用CoreUI圖標
   const navigationItems = [
@@ -86,10 +86,12 @@ const UserGuide = () => {
   return (
     <div style={{ padding: '1rem 0' }}>
       <CSidebarNav>
-        <CNavTitle>
-          <CIcon icon={cilSpeedometer} className="me-2" />
-          報價單快速導航
-        </CNavTitle>
+        {!isCollapsed && (
+          <CNavTitle>
+            <CIcon icon={cilSpeedometer} className="me-2" />
+            報價單快速導航
+          </CNavTitle>
+        )}
         
         {navigationItems.map((item) => (
           <CNavItem
@@ -102,23 +104,25 @@ const UserGuide = () => {
             style={{ cursor: 'pointer' }}
           >
             <CIcon customClassName="nav-icon" icon={item.icon} />
-            {item.label}
+            {!isCollapsed && <span>{item.label}</span>}
           </CNavItem>
         ))}
 
-        <CNavGroup
-          toggler={
-            <>
-              <CIcon customClassName="nav-icon" icon={cilNotes} />
-              使用說明
-            </>
-          }
-        >
-          <CNavItem>基本操作指南</CNavItem>
-          <CNavItem>進階功能說明</CNavItem>
-          <CNavItem>常見問題解決</CNavItem>
-          <CNavItem>使用技巧</CNavItem>
-        </CNavGroup>
+        {!isCollapsed && (
+          <CNavGroup
+            toggler={
+              <>
+                <CIcon customClassName="nav-icon" icon={cilNotes} />
+                使用說明
+              </>
+            }
+          >
+            <CNavItem>基本操作指南</CNavItem>
+            <CNavItem>進階功能說明</CNavItem>
+            <CNavItem>常見問題解決</CNavItem>
+            <CNavItem>使用技巧</CNavItem>
+          </CNavGroup>
+        )}
       </CSidebarNav>
     </div>
   )
