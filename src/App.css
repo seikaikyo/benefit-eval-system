@@ -1496,9 +1496,9 @@ textarea {
     gap: 15px !important;
   }
   
-  /* 手機版比較表格也改為垂直布局 */
+  /* 手機版比較表格適應螢幕寬度 */
   .comparison-container {
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
     max-width: 100vw !important;
     margin: 0 !important;
     padding: 10px !important;
@@ -1506,15 +1506,30 @@ textarea {
   }
   
   .comparison-table {
-    min-width: 600px !important; /* 保持最小寬度以便橫向滾動 */
-    width: auto !important;
-    font-size: 12px !important; /* 縮小字體 */
+    width: 100% !important; /* 佔滿可用寬度 */
+    min-width: auto !important;
+    font-size: 11px !important; /* 縮小字體 */
+    table-layout: fixed !important; /* 固定表格布局 */
   }
   
   .comparison-table th,
   .comparison-table td {
-    padding: 8px 4px !important; /* 減少內距 */
-    font-size: 11px !important;
+    padding: 6px 3px !important; /* 減少內距 */
+    font-size: 10px !important;
+    word-wrap: break-word !important; /* 文字換行 */
+    vertical-align: top !important;
+  }
+  
+  /* 手機版列寬調整 */
+  .comparison-table th:first-child,
+  .comparison-table td:first-child {
+    width: 35% !important; /* 功能項目列 */
+  }
+  
+  .comparison-table th:not(:first-child),
+  .comparison-table td:not(:first-child) {
+    width: 21.67% !important; /* 三個方案列平均分配 */
+    text-align: center !important;
   }
 }
 
@@ -1538,18 +1553,32 @@ textarea {
   .comparison-container {
     overflow-x: visible !important;
     max-width: none !important;
+    padding: 20px !important;
   }
   
   .comparison-table {
     width: 100% !important;
     min-width: auto !important;
     font-size: 14px !important;
+    table-layout: auto !important; /* 桌面版自動布局 */
   }
   
   .comparison-table th,
   .comparison-table td {
     padding: 12px !important;
     font-size: 14px !important;
+    word-wrap: normal !important;
+  }
+  
+  /* 桌面版恢復原始列寬 */
+  .comparison-table th:first-child,
+  .comparison-table td:first-child {
+    width: 40% !important;
+  }
+  
+  .comparison-table th:not(:first-child),
+  .comparison-table td:not(:first-child) {
+    width: 20% !important;
   }
 }
 
@@ -1589,13 +1618,23 @@ textarea {
   .back-to-top-btn {
     width: 45px !important;
     height: 45px !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important; /* 確保在最上層 */
+    position: fixed !important;
   }
   
   .back-to-top-btn.visible {
     display: flex !important;
+    opacity: 0.9 !important;
   }
   
   .back-to-top-btn.hidden {
     display: none !important;
+  }
+  
+  .back-to-top-btn:hover {
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
   }
 }

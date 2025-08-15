@@ -18,18 +18,23 @@ const BackToTop = () => {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // 監聽滾動事件，決定是否顯示按鈕（僅桌面版）
+  // 監聽滾動事件，決定是否顯示按鈕
   useEffect(() => {
-    if (isMobile) {
-      // 手機版直接顯示，不做滾動偵測
-      setIsVisible(true)
-      return
-    }
-
     const toggleVisibility = () => {
-      const scrolled = window.pageYOffset || 
-                      document.documentElement.scrollTop || 
-                      document.body.scrollTop || 0
+      let scrolled = 0
+      
+      if (isMobile) {
+        // 手機版檢查 .admin-main 容器的滾動
+        const adminMain = document.querySelector('.admin-main')
+        if (adminMain) {
+          scrolled = adminMain.scrollTop
+        }
+      } else {
+        // 桌面版檢查 window 滾動
+        scrolled = window.pageYOffset || 
+                   document.documentElement.scrollTop || 
+                   document.body.scrollTop || 0
+      }
       
       if (scrolled > 300) {
         setIsVisible(true)
@@ -38,27 +43,54 @@ const BackToTop = () => {
       }
     }
 
-    // 桌面版才做滾動偵測
+    // 初始檢查
     toggleVisibility()
-    window.addEventListener('scroll', toggleVisibility, { passive: true })
     
-    return () => {
-      window.removeEventListener('scroll', toggleVisibility)
+    if (isMobile) {
+      // 手機版監聽 .admin-main 容器的滾動
+      const adminMain = document.querySelector('.admin-main')
+      if (adminMain) {
+        adminMain.addEventListener('scroll', toggleVisibility, { passive: true })
+        return () => {
+          adminMain.removeEventListener('scroll', toggleVisibility)
+        }
+      }
+    } else {
+      // 桌面版監聽 window 滾動
+      window.addEventListener('scroll', toggleVisibility, { passive: true })
+      return () => {
+        window.removeEventListener('scroll', toggleVisibility)
+      }
     }
   }, [isMobile])
 
   // 平滑滾動到頂部
   const scrollToTop = () => {
-    // 多種方式確保兼容性
-    if (window.scrollTo) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
+    if (isMobile) {
+      // 手機版滾動 .admin-main 容器
+      const adminMain = document.querySelector('.admin-main')
+      if (adminMain) {
+        if (adminMain.scrollTo) {
+          adminMain.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          })
+        } else {
+          adminMain.scrollTop = 0
+        }
+      }
     } else {
-      // 回退方案
-      document.documentElement.scrollTop = 0
-      document.body.scrollTop = 0
+      // 桌面版滾動 window
+      if (window.scrollTo) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+      } else {
+        // 回退方案
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+      }
     }
   }
 
