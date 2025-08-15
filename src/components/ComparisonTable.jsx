@@ -374,50 +374,144 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           </div>
         </div>
 
-        {/* 方案成本效益比較 */}
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '25px'}}>
-          {/* Basic方案 */}
-          <div style={{
-            border: '2px solid #f44336',
-            borderRadius: '10px',
-            padding: '20px',
-            background: 'white',
-            boxShadow: '0 2px 8px rgba(244, 67, 54, 0.1)'
-          }}>
-            <h4 style={{margin: '0 0 12px 0', color: '#f44336', fontWeight: '600'}}>Basic MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</p>
-            <p style={{color: '#f44336', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>❌ 高風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>一次{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic'), companyInfo.annualRevenue).toFixed(1)}小時停機損失({((getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic')) / 10000).toFixed(1)}萬)就超過與Premium的差額，對{(companyInfo.annualRevenue / 10000).toFixed(1)}億營業而言風險太高。</p>
-          </div>
+        {/* 智慧方案效益分析 */}
+        {(() => {
+          // 營業額區間判斷，決定每個方案的分析內容
+          const revenue = companyInfo.annualRevenue
+          
+          // Basic方案分析
+          const basicAnalysis = (() => {
+            if (revenue < 2000) {
+              return {
+                status: '✅ 推薦',
+                color: '#4caf50',
+                reason: '小型企業最佳選擇，成本效益平衡',
+                detail: `年維護成本${(getCombinedPriceLocal('basic', 'basic') / 10000).toFixed(1)}萬，佔營業額${((getCombinedPriceLocal('basic', 'basic') / (revenue * 10000)) * 100).toFixed(2)}%，基礎保障已足夠`
+              }
+            } else if (revenue < 5000) {
+              return {
+                status: '⚠️ 風險偏高',
+                color: '#ff9800',
+                reason: '中型企業建議升級方案',
+                detail: `雖然成本較低，但對${(revenue / 10000).toFixed(1)}億營業額企業而言，缺乏預防維護風險較高`
+              }
+            } else {
+              return {
+                status: '❌ 不建議',
+                color: '#f44336',
+                reason: '大型企業風險過高',
+                detail: `一次${calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('basic', 'basic'), revenue).toFixed(1)}小時停機損失就超過與Premium差額，風險太高`
+              }
+            }
+          })()
+          
+          // Advanced方案分析
+          const advancedAnalysis = (() => {
+            if (revenue < 2000) {
+              return {
+                status: '⚠️ 過度規格',
+                color: '#ff9800',
+                reason: '小型企業可能過度投資',
+                detail: `成本${(getCombinedPriceLocal('advanced', 'advanced') / 10000).toFixed(1)}萬對小型企業負擔較重，Basic方案已能滿足基本需求`
+              }
+            } else if (revenue < 5000) {
+              return {
+                status: '✅ 推薦',
+                color: '#4caf50',
+                reason: '中型企業最佳平衡',
+                detail: `有預防維護，成本${(getCombinedPriceLocal('advanced', 'advanced') / 10000).toFixed(1)}萬佔營業額${((getCombinedPriceLocal('advanced', 'advanced') / (revenue * 10000)) * 100).toFixed(2)}%，合理投資`
+              }
+            } else {
+              return {
+                status: '⚠️ 風險存在',
+                color: '#ff9800',
+                reason: '大型企業仍有夜班風險',
+                detail: `雖有預防維護，但夜班故障風險對${(revenue / 10000).toFixed(1)}億營業額企業影響重大`
+              }
+            }
+          })()
+          
+          // Premium方案分析
+          const premiumAnalysis = (() => {
+            if (revenue < 2000) {
+              return {
+                status: '⚠️ 投資過大',
+                color: '#ff9800',
+                reason: '小型企業投資回報期較長',
+                detail: `成本${(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬佔營業額${((getCombinedPriceLocal('premium', 'premium') / (revenue * 10000)) * 100).toFixed(2)}%，投資比例偏高`
+              }
+            } else if (revenue < 5000) {
+              return {
+                status: '✅ 可考慮',
+                color: '#4caf50',
+                reason: '中型企業頂級保障',
+                detail: `7*24支援提供最高保障，成本${(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬對中型企業負擔合理`
+              }
+            } else {
+              return {
+                status: '✅ 強烈推薦',
+                color: '#4caf50',
+                reason: '大型企業必備保障',
+                detail: `成本僅佔營業額${((getCombinedPriceLocal('premium', 'premium') / (revenue * 10000)) * 100).toFixed(3)}%，ROI極高，風險最小化`
+              }
+            }
+          })()
+          
+          return (
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '25px'}}>
+              {/* Basic方案智慧分析 */}
+              <div style={{
+                border: `2px solid ${basicAnalysis.color}`,
+                borderRadius: '10px',
+                padding: '20px',
+                background: 'white',
+                boxShadow: `0 2px 8px ${basicAnalysis.color}20`
+              }}>
+                <h4 style={{margin: '0 0 12px 0', color: basicAnalysis.color, fontWeight: '600'}}>Basic MA 方案</h4>
+                <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('basic', 'basic'))}</p>
+                <p style={{color: basicAnalysis.color, fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>{basicAnalysis.status}</p>
+                <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>
+                  <strong>{basicAnalysis.reason}</strong><br/>
+                  {basicAnalysis.detail}
+                </p>
+              </div>
 
-          {/* Advanced方案 */}
-          <div style={{
-            border: '2px solid #ff9800',
-            borderRadius: '10px',
-            padding: '20px',
-            background: 'white',
-            boxShadow: '0 2px 8px rgba(255, 152, 0, 0.1)'
-          }}>
-            <h4 style={{margin: '0 0 12px 0', color: '#ff9800', fontWeight: '600'}}>Advanced MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</p>
-            <p style={{color: '#ff9800', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>⚠️ 中等風險</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>有預防維護但夜班故障風險仍存在，一次{(calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium') - getCombinedPriceLocal('advanced', 'advanced'), companyInfo.annualRevenue) + 2).toFixed(1)}小時停機損失可能超過年整體節省效益。</p>
-          </div>
+              {/* Advanced方案智慧分析 */}
+              <div style={{
+                border: `2px solid ${advancedAnalysis.color}`,
+                borderRadius: '10px',
+                padding: '20px',
+                background: 'white',
+                boxShadow: `0 2px 8px ${advancedAnalysis.color}20`
+              }}>
+                <h4 style={{margin: '0 0 12px 0', color: advancedAnalysis.color, fontWeight: '600'}}>Advanced MA 方案</h4>
+                <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('advanced', 'advanced'))}</p>
+                <p style={{color: advancedAnalysis.color, fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>{advancedAnalysis.status}</p>
+                <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>
+                  <strong>{advancedAnalysis.reason}</strong><br/>
+                  {advancedAnalysis.detail}
+                </p>
+              </div>
 
-          {/* Premium方案 */}
-          <div style={{
-            border: '2px solid #4caf50',
-            borderRadius: '10px',
-            padding: '20px',
-            background: 'white',
-            boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)'
-          }}>
-            <h4 style={{margin: '0 0 12px 0', color: '#4caf50', fontWeight: '600'}}>Premium MA 方案</h4>
-            <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('premium', 'premium'))}</p>
-            <p style={{color: '#4caf50', fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>✅ 最佳投資</p>
-            <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>7*24支援，最適合連續性要求。成本僅佔年營業額{(((getCombinedPriceLocal('premium', 'premium') / (companyInfo.annualRevenue * 10000)) * 100)).toFixed(3)}%，ROI極高。</p>
-          </div>
-        </div>
+              {/* Premium方案智慧分析 */}
+              <div style={{
+                border: `2px solid ${premiumAnalysis.color}`,
+                borderRadius: '10px',
+                padding: '20px',
+                background: 'white',
+                boxShadow: `0 2px 8px ${premiumAnalysis.color}20`
+              }}>
+                <h4 style={{margin: '0 0 12px 0', color: premiumAnalysis.color, fontWeight: '600'}}>Premium MA 方案</h4>
+                <p style={{margin: '8px 0', fontWeight: '600', color: '#333'}}>年成本：{formatPrice(getCombinedPriceLocal('premium', 'premium'))}</p>
+                <p style={{color: premiumAnalysis.color, fontWeight: 'bold', margin: '8px 0', fontSize: '16px'}}>{premiumAnalysis.status}</p>
+                <p style={{margin: '8px 0', fontSize: '14px', color: '#666', lineHeight: '1.5'}}>
+                  <strong>{premiumAnalysis.reason}</strong><br/>
+                  {premiumAnalysis.detail}
+                </p>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* 智慧方案推薦系統 */}
         {(() => {
@@ -516,32 +610,75 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           )
         })()}
 
-        {/* 成本對比總結 - 智能計算 */}
-        <div style={{
-          border: '2px solid #9c27b0',
-          borderRadius: '10px',
-          padding: '25px',
-          background: 'white',
-          boxShadow: '0 2px 8px rgba(156, 39, 176, 0.1)'
-        }}>
-          <h4 style={{margin: '0 0 20px 0', color: '#9c27b0', textAlign: 'center', fontWeight: '600'}}>📊 Premium方案年成本 vs 單次停機損失</h4>
-          <div style={{
-            textAlign: 'center',
-            padding: '20px',
-            border: '2px solid #e0e0e0',
-            borderRadius: '10px',
-            background: 'white',
-            fontSize: '18px',
-            fontWeight: '600'
-          }}>
-            <span style={{color: '#4caf50'}}>{(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬年成本</span>
-            <span style={{margin: '0 20px', color: '#666', fontSize: '24px'}}>&lt;</span>
-            <span style={{color: '#f44336'}}>{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機損失({(getCombinedPriceLocal('premium', 'premium') / 10000).toFixed(1)}萬)</span>
-          </div>
-          <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
-            避免{calculateRevenue.breakEvenHours(getCombinedPriceLocal('premium', 'premium'), companyInfo.annualRevenue).toFixed(1)}小時停機即可回本
-          </div>
-        </div>
+        {/* 智慧投資效益分析 */}
+        {(() => {
+          const revenue = companyInfo.annualRevenue
+          const recommendedPlan = revenue < 2000 ? 'basic' : revenue < 5000 ? 'advanced' : 'premium'
+          const recommendedPrice = getCombinedPriceLocal(recommendedPlan, recommendedPlan)
+          const recommendedName = recommendedPlan === 'basic' ? 'Basic' : recommendedPlan === 'advanced' ? 'Advanced' : 'Premium'
+          const breakEvenHours = calculateRevenue.breakEvenHours(recommendedPrice, revenue)
+          const breakEvenDays = Math.ceil(breakEvenHours / 24)
+          
+          let analysisContent = null
+          let borderColor = ''
+          
+          if (revenue < 2000) {
+            borderColor = '#2196f3'
+            analysisContent = {
+              title: '💙 小型企業投資效益分析',
+              mainText: `${recommendedName}方案年成本 ${(recommendedPrice / 10000).toFixed(1)}萬`,
+              comparison: `避免 ${breakEvenDays} 天停機即可回本`,
+              detail: `對小型企業而言，Basic方案提供基礎保障，投資回報期短，風險可控`
+            }
+          } else if (revenue < 5000) {
+            borderColor = '#ff9800'
+            analysisContent = {
+              title: '🧡 中型企業投資效益分析',
+              mainText: `${recommendedName}方案年成本 ${(recommendedPrice / 10000).toFixed(1)}萬`,
+              comparison: `避免 ${breakEvenDays} 天停機即可回本`,
+              detail: `Advanced方案包含預防維護，成本佔營業額${((recommendedPrice / (revenue * 10000)) * 100).toFixed(2)}%，投資合理`
+            }
+          } else {
+            borderColor = '#4caf50'
+            analysisContent = {
+              title: '💚 大型企業投資效益分析',
+              mainText: `${recommendedName}方案年成本 ${(recommendedPrice / 10000).toFixed(1)}萬`,
+              comparison: `避免 ${breakEvenDays} 天停機即可回本`,
+              detail: `Premium方案成本僅佔營業額${((recommendedPrice / (revenue * 10000)) * 100).toFixed(3)}%，7*24支援ROI極高`
+            }
+          }
+          
+          return (
+            <div style={{
+              border: `2px solid ${borderColor}`,
+              borderRadius: '10px',
+              padding: '25px',
+              background: 'white',
+              boxShadow: `0 2px 8px ${borderColor}20`
+            }}>
+              <h4 style={{margin: '0 0 20px 0', color: borderColor, textAlign: 'center', fontWeight: '600'}}>{analysisContent.title}</h4>
+              <div style={{
+                textAlign: 'center',
+                padding: '20px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '10px',
+                background: 'white',
+                fontSize: '18px',
+                fontWeight: '600'
+              }}>
+                <div style={{color: borderColor, marginBottom: '10px'}}>
+                  {analysisContent.mainText}
+                </div>
+                <div style={{color: '#666', fontSize: '16px'}}>
+                  {analysisContent.comparison}
+                </div>
+              </div>
+              <div style={{textAlign: 'center', marginTop: '15px', fontSize: '14px', color: '#666'}}>
+                {analysisContent.detail}
+              </div>
+            </div>
+          )
+        })()}
 
       </div>
     </div>
