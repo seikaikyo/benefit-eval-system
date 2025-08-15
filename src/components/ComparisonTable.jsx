@@ -301,7 +301,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
               風險係數：{(shiftPatterns[companyInfo.shiftPattern].riskMultiplier).toFixed(1)}x
             </p>
           </div>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'center'}}>
+          <div className="revenue-stats-grid">
             <div style={{border: '2px solid #2196f3', padding: '18px', borderRadius: '8px', background: 'white'}}>
               <p style={{margin: '5px 0', fontSize: '14px', color: '#666', fontWeight: '500'}}>年營業額</p>
               <p style={{margin: '0', fontSize: '24px', color: '#2196f3', fontWeight: 'bold'}}>{(companyInfo.annualRevenue / 10000).toFixed(1)}億</p>
@@ -338,7 +338,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
         }}>
           <h4 style={{margin: '0 0 20px 0', color: '#444', fontWeight: '600'}}>⚠️ 停機風險成本分析（已含班別風險係數）</h4>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px'}}>
+          <div className="downtime-risk-grid">
             <div style={{textAlign: 'center', padding: '20px', border: '2px solid #ffc107', borderRadius: '10px', background: 'white'}}>
               <p style={{margin: '8px 0', fontSize: '16px', color: '#666', fontWeight: '500'}}>2小時停機</p>
               <p style={{margin: '0', fontSize: '20px', color: '#f57c00', fontWeight: 'bold'}}>
@@ -458,7 +458,7 @@ const ComparisonTable = ({ companyInfo, serviceDetails, shiftPatterns }) => {
           })()
           
           return (
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '25px'}}>
+            <div className="service-recommendations-grid" style={{marginBottom: '25px'}}>
               {/* Basic方案智慧分析 */}
               <div style={{
                 border: `2px solid ${basicAnalysis.color}`,

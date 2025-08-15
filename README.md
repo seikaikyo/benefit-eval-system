@@ -1,7 +1,7 @@
-# WISE-IoT SRP 維護服務效益評估系統 V2.1.8
+# WISE-IoT SRP 維護服務效益評估系統 V2.1.9
 
 [![Deploy Status](https://img.shields.io/badge/deploy-automated-brightgreen)](https://benefit-eval-system.vercel.app/)
-[![Version](https://img.shields.io/badge/version-2.1.8-blue)](#版本歷程)
+[![Version](https://img.shields.io/badge/version-2.1.9-blue)](#版本歷程)
 [![React](https://img.shields.io/badge/React-18+-61dafb)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5+-646cff)](https://vitejs.dev/)
 [![CoreUI](https://img.shields.io/badge/CoreUI-5.7+-blue)](https://coreui.io/)
@@ -152,6 +152,13 @@ api/
 ```
 
 ## 📈 版本歷程
+
+### V2.1.9 - 手機版響應式設計完善 (2025-08-15)
+- 📱 **手機版布局優化**：智慧推薦方案卡片改為垂直排列
+- 🔧 **內容溢出修復**：解決手機版內容超出螢幕寬度問題
+- 🎯 **響應式斷點**：符合CoreUI標準的斷點設計 (≤767px手機版)
+- ⚡ **滾動體驗**：修復滾動條問題，支援觸控和滑鼠滾輪
+- 🎨 **CSS優化**：移除內聯樣式，改用CSS類進行響應式控制
 
 ### V2.1.8 (2025-08-15) - 智慧推薦系統與全面動態分析
 **🧠 智慧推薦系統升級**:
@@ -328,6 +335,6 @@ api/
 
 **🤖 Generated with [Claude Code](https://claude.ai/code)**
 
-*Last Updated: 2025-08-15 - V2.1.8 智慧推薦系統*
+*Last Updated: 2025-08-15 - V2.1.9 手機版響應式設計完善*
 
 </div>
